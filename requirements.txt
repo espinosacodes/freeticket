@@ -1,0 +1,5 @@
+google-auth>=2.30
+requests>=2.32
+PyJWT[crypto]>=2.9
+python-dotenv>=1.0
+cryptography>=42.0
