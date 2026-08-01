@@ -38,9 +38,20 @@ def main():
     print("\nTablero")
     bw.run(RAW, OUT, "web")
 
-    print(f"\nListo. Salidas en {OUT}/:")
-    for f in sorted(os.listdir(OUT)):
+    # Las dos entregas que pide el enunciado van en la raíz, con ese nombre
+    # exacto. Se copian desde out/ en vez de escribirse dos veces, para que
+    # no puedan quedar desincronizadas.
+    import shutil
+    for f in ("matches.csv", "forecast.csv"):
+        shutil.copyfile(os.path.join(OUT, f), f)
+
+    print("\nEntregas (raíz del repo):")
+    for f in ("matches.csv", "forecast.csv", "NOTAS.md"):
         print(f"  {f}")
+    print(f"\nArtefactos de apoyo en {OUT}/:")
+    for f in sorted(os.listdir(OUT)):
+        if os.path.isfile(os.path.join(OUT, f)):
+            print(f"  {f}")
 
 
 if __name__ == "__main__":

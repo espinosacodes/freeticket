@@ -206,6 +206,13 @@ a { color: inherit; }
 }
 .btn--primary:hover { background: #ffdb3a; border-color: #ffdb3a; }
 
+/* Iconos de píxel (Pixelarticons). crispEdges + rejilla de 24 = bloques nítidos. */
+.px {
+  width: 16px; height: 16px; flex: none;
+  display: inline-block; vertical-align: -3px;
+  shape-rendering: crispEdges;
+}
+
 /* números: tabular sólo donde se alinean en columna (tablas, ejes) */
 .tnum { font-variant-numeric: tabular-nums; }
 /* cifras protagonistas: proporcionales, se ven mejor a tamaño display */
@@ -232,7 +239,9 @@ a { color: inherit; }
     transition-duration: .001ms !important;
     scroll-behavior: auto !important;
   }
-  .reveal { opacity: 1; transform: none; }
+  /* Misma especificidad que `.js .reveal`, si no pierde y el contenido
+     se queda escondido justo para quien pidió no tener movimiento. */
+  .js .reveal, .reveal { opacity: 1 !important; transform: none !important; }
 }
 
 /* ---------- tooltip compartido ---------- */

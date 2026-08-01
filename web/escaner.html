@@ -34,12 +34,11 @@
   }
   .net {
     font-size: 11.5px; font-weight: 900; padding: 5px 11px; border-radius: var(--r-pill);
-    border: 1px solid var(--border-2); color: var(--ink-2); white-space: nowrap;
+    border: 1px solid var(--border-2); color: var(--ok); white-space: nowrap;
     display: inline-flex; align-items: center; gap: 6px;
   }
-  .net::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--ok); }
+  .net .px { width: 14px; height: 14px; }
   .net.off { color: var(--warn); border-color: #ffd10259; }
-  .net.off::before { background: var(--warn); }
 
   .count { padding: 18px 20px; margin-bottom: 12px; --accent-line: var(--ft-yellow); }
   .count .n {
@@ -80,7 +79,8 @@
     align-items: center; gap: 12px;
   }
   .banner.show { display: flex; }
-  .banner .ic { font-size: 22px; line-height: 1; flex: none; }
+  /* 1:1 con la rejilla de 24 del icono: los bloques quedan exactos */
+  .banner .ic { width: 24px; height: 24px; flex: none; transform: scale(1.35); margin: 0 5px; }
   .banner .s { font-weight: 500; font-size: 13px; letter-spacing: 0; opacity: .92; margin-top: 1px; }
   .b-ok  { background: var(--ok);   color: #04140b; }
   .b-dup { background: var(--ft-yellow); color: var(--ft-yellow-ink); }
@@ -92,8 +92,8 @@
   li { display: flex; justify-content: space-between; gap: 10px; padding: 10px 2px;
        border-top: 1px solid var(--border); font-size: 13px; }
   li .t { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--ink-2); }
-  li .r { font-weight: 900; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; }
-  li .r::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+  li .r { font-weight: 900; white-space: nowrap; display: inline-flex; align-items: center; gap: 7px; }
+  li .r .px { width: 14px; height: 14px; }
   .r-ok { color: var(--ok); } .r-dup { color: var(--warn); }
   .r-bad { color: var(--danger); } .r-q { color: var(--ink-3); }
 
@@ -104,6 +104,17 @@
   code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .92em;
          background: var(--surface-2); padding: 1px 5px; border-radius: 5px; }
 </style>
+
+<!-- Iconos: Pixelarticons (MIT) — rejilla de 24px, trazos en bloque. -->
+<svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute">
+  <symbol id="px-check" viewBox="0 0 24 24"><path d="M18 6h2v2h-2V6zm-2 4V8h2v2h-2zm-2 2v-2h2v2h-2zm-2 2h2v-2h-2v2zm-2 2h2v-2h-2v2zm-2 0v2h2v-2H8zm-2-2h2v2H6v-2zm0 0H4v-2h2v2z" fill="currentColor"/></symbol>
+  <symbol id="px-close" viewBox="0 0 24 24"><path d="M5 5h2v2H5V5zm4 4H7V7h2v2zm2 2H9V9h2v2zm2 0h-2v2H9v2H7v2H5v2h2v-2h2v-2h2v-2h2v2h2v2h2v2h2v-2h-2v-2h-2v-2h-2v-2zm2-2v2h-2V9h2zm2-2v2h-2V7h2zm0 0V5h2v2h-2z" fill="currentColor"/></symbol>
+  <symbol id="px-reload" viewBox="0 0 24 24"><path d="M16 2h-2v2h2v2H4v2H2v5h2V8h12v2h-2v2h2v-2h2V8h2V6h-2V4h-2V2zM6 20h2v2h2v-2H8v-2h12v-2h2v-5h-2v5H8v-2h2v-2H8v2H6v2H4v2h2v2z" fill="currentColor"/></symbol>
+  <symbol id="px-upload" viewBox="0 0 24 24"><path d="M11 5V3h2v2h2v2h2v2h-2V7h-2v10h-2V7H9v2H7V7h2V5h2zM3 15v6h18v-6h-2v4H5v-4H3z" fill="currentColor"/></symbol>
+  <symbol id="px-alert" viewBox="0 0 24 24"><path d="M13 1h-2v2H9v2H7v2H5v2H3v2H1v2h2v2h2v2h2v2h2v2h2v2h2v-2h2v-2h2v-2h2v-2h2v-2h2v-2h-2V9h-2V7h-2V5h-2V3h-2V1zm0 2v2h2v2h2v2h2v2h2v2h-2v2h-2v2h-2v2h-2v2h-2v-2H9v-2H7v-2H5v-2H3v-2h2V9h2V7h2V5h2V3h2zm0 4h-2v6h2V7zm0 8h-2v2h2v-2z" fill="currentColor"/></symbol>
+  <symbol id="px-signal" viewBox="0 0 24 24"><path d="M16 4h6v16h-6V4ZM2 14h6v6H2v-6Zm13-4H9v10h6V10Z" fill="currentColor"/></symbol>
+  <symbol id="px-signal-off" viewBox="0 0 24 24"><path d="M4 2H2v2h2v2H2v2h2V6h2v2h2V6H6V4h2V2H6v2H4V2Zm12 2v16h6V4h-6Zm2 2h2v12h-2V6Zm-9 4v10h6V10H9Zm2 8v-6h2v6h-2Zm-3-4v6H2v-6h6Zm-2 4v-2H4v2h2Z" fill="currentColor"/></symbol>
+</svg>
 
 <div class="wrap">
   <div class="brandbar">
@@ -180,10 +191,15 @@ const seen = new Set();          // ticket_id que este dispositivo ya dejó entr
 let events = [], current = null, serverCount = null;
 
 // ---------- red ----------
+const px = (id, cls) => '<svg class="px ' + (cls || '') +
+  '" shape-rendering="crispEdges" aria-hidden="true"><use href="#px-' + id + '"/></svg>';
+
 function net() {
   const on = navigator.onLine;
-  $('#net').textContent = on ? (queue.length ? queue.length + ' en cola' : 'en línea') : 'sin señal';
-  $('#net').className = 'net' + (on && !queue.length ? '' : ' off');
+  const ok = on && !queue.length;
+  const txt = on ? (queue.length ? queue.length + ' en cola' : 'en línea') : 'sin señal';
+  $('#net').innerHTML = px(ok ? 'signal' : 'signal-off') + '<span>' + txt + '</span>';
+  $('#net').className = 'net' + (ok ? '' : ' off');
 }
 addEventListener('online', () => { net(); flush(); });
 addEventListener('offline', net);
@@ -227,7 +243,7 @@ setInterval(refreshAforo, 15000);
 
 // ---------- feedback ----------
 const CLS = { ok: 'b-ok', duplicado: 'b-dup', ya_recibido: 'b-dup', encolado: 'b-dup' };
-const ICO = { ok: '✓', duplicado: '↺', ya_recibido: '↺', encolado: '⇡' };
+const ICO = { ok: 'check', duplicado: 'reload', ya_recibido: 'reload', encolado: 'upload' };
 const TXT = {
   ok: ['Adelante', 'entrada válida'],
   duplicado: ['Ya entró', 'este pase se escaneó antes'],
@@ -242,7 +258,7 @@ function banner(result) {
   const [t, s] = TXT[result] || ['Error', result];
   const b = $('#ban');
   b.className = 'banner show ' + (CLS[result] || 'b-bad');
-  b.innerHTML = '<span class="ic">' + (ICO[result] || '✕') + '</span>' +
+  b.innerHTML = px(ICO[result] || 'close', 'ic') +
                 '<span>' + t + '<div class="s">' + s + '</div></span>';
   const f = $('#flash');
   f.style.background = result === 'ok' ? 'var(--ok)' : (CLS[result] ? 'var(--ft-yellow)' : 'var(--danger)');
@@ -256,7 +272,8 @@ function logLine(qr, result) {
   const tid = (qr || '').split('.')[1] || '—';
   const li = document.createElement('li');
   li.innerHTML = '<span class="t">' + tid + '</span><span class="r ' +
-                 (result === 'encolado' ? 'r-q' : cls) + '">' + result + '</span>';
+                 (result === 'encolado' ? 'r-q' : cls) + '">' +
+                 px(ICO[result] || 'close') + result + '</span>';
   $('#log').prepend(li);
   while ($('#log').children.length > 12) $('#log').lastChild.remove();
 }

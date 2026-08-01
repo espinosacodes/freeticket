@@ -443,11 +443,12 @@ document.getElementById('theme').onclick = () => {
     ' vec2 q=vec2(fbm(p*1.6+vec2(0.,t)),fbm(p*1.6+vec2(5.2,-t)));',
     ' float n=fbm(p*2.3+q*1.5+vec2(t*.7,t*.2));',
     // la energía vive arriba a la derecha; el titular queda abajo-izquierda
-    ' float glow=pow(clamp(1.-distance(uv,vec2(.93,1.02))*1.05,0.,1.),2.3);',
-    ' float e=clamp(n*glow*2.6-.06,0.,1.);',
+    // el núcleo cae fuera del lienzo: se ve la trama, no un bloque sólido
+    ' float glow=pow(clamp(1.-distance(uv,vec2(1.06,1.16))*.92,0.,1.),2.1);',
+    ' float e=clamp(n*glow*3.1-.05,0.,1.);',
     // cuantización tramada a 4 niveles: de ahí el look de 8 bits
     ' float a=floor(e*4.+bayer(gl_FragCoord.xy))/4.;',
-    ' a=clamp(a,0.,1.)*.5;',
+    ' a=clamp(a,0.,1.)*.42;',
     ' vec3 col=vec3(1.,.82,.008);',            // #ffd102
     ' gl_FragColor=vec4(col*a,a);',            // premultiplicado
     '}'
@@ -493,7 +494,10 @@ document.getElementById('theme').onclick = () => {
 
   const draw = t => { gl.uniform1f(uTime, t); gl.drawArrays(gl.TRIANGLES, 0, 3); };
 
-  if (reduced) { resize(); draw(12.0); return; }   // un solo fotograma, quieto
+  // se lee aquí y no de la constante de abajo: este bloque corre antes
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    resize(); draw(12.0); return;                  // un solo fotograma, quieto
+  }
 
   let visible = true, raf = 0, last = 0;
   if ('IntersectionObserver' in window) {

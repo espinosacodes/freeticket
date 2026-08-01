@@ -188,4 +188,4 @@ pone del lado del que sabe.)*
 | En vivo | https://espinosacodes.github.io/freeticket/ |
 | Video | 60s (máx. 2 min) |
 | Notas | [`NOTAS.md`](NOTAS.md) |
-| Entregas | [`out/matches.csv`](out/matches.csv) · [`out/forecast.csv`](out/forecast.csv) |
+| Entregas | [`matches.csv`](matches.csv) · [`forecast.csv`](forecast.csv) |

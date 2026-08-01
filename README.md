@@ -28,8 +28,8 @@ cd web && python3 -m http.server 8777    # http://localhost:8777
 
 | Archivo | Qué es |
 |---|---|
-| [`out/matches.csv`](out/matches.csv) | `sale_id, boom_user_id, confidence` |
-| [`out/forecast.csv`](out/forecast.csv) | `event_id, expected_attendance, p10, p90` — solo agosto |
+| [`matches.csv`](matches.csv) | `sale_id, boom_user_id, confidence` |
+| [`forecast.csv`](forecast.csv) | `event_id, expected_attendance, p10, p90` — solo agosto (los 30) |
 | [`NOTAS.md`](NOTAS.md) | qué asumí, qué señal pesó más, qué haría con 4 horas más |
 | [`DEMO.md`](DEMO.md) | el guion de la demo y las respuestas a las preguntas difíciles |
 | `out/matches_auditoria.csv` | lo mismo que `matches.csv` **más la evidencia** de cada match |
@@ -123,6 +123,7 @@ el dato**:
 | [`docs/03-puerta.md`](docs/03-puerta.md) | la spec del link efímero |
 | [`docs/04-metricas.md`](docs/04-metricas.md) | las 6 métricas de operación que hoy no existen |
 | [`docs/05-despliegue.md`](docs/05-despliegue.md) | qué está corriendo, y los dos bloqueos de AWS que sorteamos |
+| [`docs/06-metodo.md`](docs/06-metodo.md) | el detalle largo detrás de `NOTAS.md` |
 
 `wallet_pass.py` genera pases de Google Wallet reales: la clase se crea una
 vez por show y cada entrada se firma como JWT, así que emitir 500 pases

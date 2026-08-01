@@ -56,10 +56,19 @@
   .actions .btn { width: 100%; }
 
   .dead { text-align: center; padding: 42px 12px; }
-  .dead .i { font-size: 30px; line-height: 1; margin-bottom: 12px; }
+  .dead .px { width: 30px; height: 30px; margin-bottom: 12px; color: var(--ink-3); }
   .dead .t { font-size: 19px; font-weight: 900; letter-spacing: -.02em; margin-bottom: 6px; }
   .dead .s { color: var(--ink-2); font-size: 14px; }
 </style>
+
+<!-- Iconos: Pixelarticons (MIT) — rejilla de 24px, trazos en bloque. -->
+<svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute">
+  <symbol id="px-label" viewBox="0 0 24 24"><path d="M12 2H2v10h2v2h2v2h2v2h2v2h2v2h2v-2h2v-2h2v-2h2v-2h2v-2h-2v-2h-2V8h-2V6h-2V4h-2V2zm0 2v2h2v2h2v2h2v2h2v2h-2v2h-2v2h-2v2h-2v-2h-2v-2H8v-2H6v-2H4V4h8zM6 6h2v2H6V6z" fill="currentColor"/></symbol>
+  <symbol id="px-alert" viewBox="0 0 24 24"><path d="M13 1h-2v2H9v2H7v2H5v2H3v2H1v2h2v2h2v2h2v2h2v2h2v2h2v-2h2v-2h2v-2h2v-2h2v-2h2v-2h-2V9h-2V7h-2V5h-2V3h-2V1zm0 2v2h2v2h2v2h2v2h2v2h-2v2h-2v2h-2v2h-2v2h-2v-2H9v-2H7v-2H5v-2H3v-2h2V9h2V7h2V5h2V3h2zm0 4h-2v6h2V7zm0 8h-2v2h2v-2z" fill="currentColor"/></symbol>
+  <symbol id="px-clock" viewBox="0 0 24 24"><path d="M19 3H5v2H3v14h2v2h14v-2h2V5h-2V3zm0 2v14H5V5h14zm-8 2h2v6h4v2h-6V7z" fill="currentColor"/></symbol>
+  <symbol id="px-search" viewBox="0 0 24 24"><path d="M6 2h8v2H6V2zM4 6V4h2v2H4zm0 8H2V6h2v8zm2 2H4v-2h2v2zm8 0v2H6v-2h8zm2-2h-2v2h2v2h2v2h2v2h2v-2h-2v-2h-2v-2h-2v-2zm0-8h2v8h-2V6zm0 0V4h-2v2h2z" fill="currentColor"/></symbol>
+  <symbol id="px-signal-off" viewBox="0 0 24 24"><path d="M4 2H2v2h2v2H2v2h2V6h2v2h2V6H6V4h2V2H6v2H4V2Zm12 2v16h6V4h-6Zm2 2h2v12h-2V6Zm-9 4v10h6V10H9Zm2 8v-6h2v6h-2Zm-3-4v6H2v-6h6Zm-2 4v-2H4v2h2Z" fill="currentColor"/></symbol>
+</svg>
 
 <div class="sheet">
   <div class="brandbar">
@@ -80,7 +89,9 @@
 const DAYS = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const dead = (i, t, s) => document.getElementById('c').innerHTML =
-  '<div class="dead"><div class="i">' + i + '</div><div class="t">' + t + '</div><div class="s">' + s + '</div></div>';
+  '<div class="dead"><svg class="px" shape-rendering="crispEdges" aria-hidden="true">' +
+  '<use href="#px-' + i + '"/></svg>' +
+  '<div class="t">' + t + '</div><div class="s">' + s + '</div></div>';
 
 function decode(tok) {
   try {
@@ -92,15 +103,15 @@ function decode(tok) {
 }
 
 const tok = location.hash.slice(1);
-if (!tok) dead('🎟️', 'Link incompleto', 'Falta el código del show.');
+if (!tok) dead('label', 'Link incompleto', 'Falta el código del show.');
 else {
   const t = decode(tok);
-  if (!t) dead('⚠️', 'Link inválido', 'Este código no se puede leer.');
+  if (!t) dead('alert', 'Link inválido', 'Este código no se puede leer.');
   else if (Date.now() / 1000 > t.exp)
-    dead('⌛', 'Este link ya caducó', 'Valía hasta 3 horas después del show. Pedí uno nuevo.');
+    dead('clock', 'Este link ya caducó', 'Valía hasta 3 horas después del show. Pedí uno nuevo.');
   else fetch('data.json').then(r => r.json()).then(d => {
     const e = d.events.find(x => x.event_id === t.event_id);
-    if (!e) return dead('🔍', 'Show no encontrado', 'El código apunta a un show que no está.');
+    if (!e) return dead('search', 'Show no encontrado', 'El código apunta a un show que no está.');
 
     const dt = new Date(e.starts_at), expd = new Date(t.exp * 1000);
     const hm = x => String(x.getHours()).padStart(2, '0') + ':' + String(x.getMinutes()).padStart(2, '0');
@@ -142,7 +153,7 @@ else {
       const b = document.querySelector('.bar .band');
       if (b) b.style.width = b.dataset.w + '%';
     });
-  }).catch(() => dead('📡', 'Sin conexión', 'No se pudo cargar la proyección.'));
+  }).catch(() => dead('signal-off', 'Sin conexión', 'No se pudo cargar la proyección.'));
 }
 </script>
 </html>
