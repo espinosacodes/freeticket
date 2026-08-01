@@ -1,0 +1,289 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - navigation [ref=e3]:
+      - generic [ref=e5]:
+        - generic [ref=e6]:
+          - link "FreeTicket" [ref=e7] [cursor=pointer]:
+            - /url: /
+            - img "FreeTicket" [ref=e8]
+          - generic [ref=e11]:
+            - link "Home" [ref=e12] [cursor=pointer]:
+              - /url: /
+            - link "Eventos" [ref=e13] [cursor=pointer]:
+              - /url: /eventos
+            - link "Comunidades" [ref=e14] [cursor=pointer]:
+              - /url: /comunidades
+        - generic [ref=e15]:
+          - link "Buscar" [ref=e16] [cursor=pointer]:
+            - /url: /buscar
+          - link "Ingresar" [ref=e19] [cursor=pointer]:
+            - /url: /cuenta/login
+          - link "Registrarse" [ref=e20] [cursor=pointer]:
+            - /url: /cuenta/register
+    - generic [ref=e21]:
+      - img "GORDCONSEJOS CALI" [ref=e22]
+      - generic [ref=e26]:
+        - generic [ref=e27]: Destacado
+        - heading "GORDCONSEJOS CALI" [level=1] [ref=e29]
+        - generic [ref=e30]:
+          - generic [ref=e31]: jue, 3 de sept
+          - generic [ref=e34]: Teatro Calima
+        - link "Comprar tickets" [ref=e37] [cursor=pointer]:
+          - /url: /eventos/gordconsejos-cali-cali
+      - generic [ref=e38]:
+        - button "Ir al slide 1" [ref=e39]
+        - button "Ir al slide 2" [ref=e40]
+        - button "Ir al slide 3" [ref=e41]
+        - button "Ir al slide 4" [ref=e42]
+        - button "Ir al slide 5" [ref=e43]
+    - generic [ref=e44]:
+      - generic [ref=e45]:
+        - heading "Próximos eventos" [level=2] [ref=e46]
+        - link "Ver todos →" [ref=e47] [cursor=pointer]:
+          - /url: /eventos
+      - generic [ref=e48]:
+        - link "jue, 3 de sept Presencial GORDCONSEJOS CALI Teatro Calima Cali $ 80.000" [ref=e49] [cursor=pointer]:
+          - /url: /eventos/gordconsejos-cali-cali
+          - generic [ref=e50]:
+            - generic [ref=e51]: jue, 3 de sept
+            - generic [ref=e52]: Presencial
+          - generic [ref=e54]:
+            - heading "GORDCONSEJOS CALI" [level=3] [ref=e55]
+            - generic [ref=e56]: Teatro Calima
+            - generic [ref=e60]: Cali
+            - paragraph [ref=e61]: $ 80.000
+        - link "mar, 4 de ago Presencial GORDCONSEJOS Boom Stand Up Bar Bogotá $ 60.000" [ref=e62] [cursor=pointer]:
+          - /url: /eventos/gordconsejos-bogota
+          - generic [ref=e63]:
+            - generic [ref=e64]: mar, 4 de ago
+            - generic [ref=e65]: Presencial
+          - generic [ref=e67]:
+            - heading "GORDCONSEJOS" [level=3] [ref=e68]
+            - generic [ref=e69]: Boom Stand Up Bar
+            - generic [ref=e73]: Bogotá
+            - paragraph [ref=e74]: $ 60.000
+        - link "vie, 18 de sept Presencial GORDO Y FEO BOGOTÁ BOOM STAND UP BAR Bogotá $ 70.000" [ref=e75] [cursor=pointer]:
+          - /url: /eventos/gordo-y-feo-chapinero
+          - generic [ref=e76]:
+            - generic [ref=e77]: vie, 18 de sept
+            - generic [ref=e78]: Presencial
+          - generic [ref=e80]:
+            - heading "GORDO Y FEO BOGOTÁ" [level=3] [ref=e81]
+            - generic [ref=e82]: BOOM STAND UP BAR
+            - generic [ref=e86]: Bogotá
+            - paragraph [ref=e87]: $ 70.000
+        - link "vie, 28 de ago Presencial GORDO Y FEO BARRANQUILLA Teatro José Consuegra Higgins Barranquilla $ 50.000" [ref=e88] [cursor=pointer]:
+          - /url: /eventos/gordo-y-feo-barranquilla
+          - generic [ref=e89]:
+            - generic [ref=e90]: vie, 28 de ago
+            - generic [ref=e91]: Presencial
+          - generic [ref=e93]:
+            - heading "GORDO Y FEO BARRANQUILLA" [level=3] [ref=e94]
+            - generic [ref=e95]: Teatro José Consuegra Higgins
+            - generic [ref=e99]: Barranquilla
+            - paragraph [ref=e100]: $ 50.000
+        - link "sáb, 5 de sept Presencial GORDO Y FEO MOSQUERA Auditorio Municipal Mosquera Mosquera $ 50.000" [ref=e101] [cursor=pointer]:
+          - /url: /eventos/gordo-y-feo-mosquera
+          - generic [ref=e102]:
+            - generic [ref=e103]: sáb, 5 de sept
+            - generic [ref=e104]: Presencial
+          - generic [ref=e106]:
+            - heading "GORDO Y FEO MOSQUERA" [level=3] [ref=e107]
+            - generic [ref=e108]: Auditorio Municipal Mosquera
+            - generic [ref=e112]: Mosquera
+            - paragraph [ref=e113]: $ 50.000
+        - link "jue, 10 de sept Presencial SEBASTIÁN RINCÓN - LE REGRESO AL SER AMADO. Boom Stand Up Bar Bogotá $ 25.000" [ref=e114] [cursor=pointer]:
+          - /url: /eventos/sebastian-rincon-le-regreso-al-ser-amado-bogota
+          - generic [ref=e115]:
+            - generic [ref=e116]: jue, 10 de sept
+            - generic [ref=e117]: Presencial
+          - generic [ref=e119]:
+            - heading "SEBASTIÁN RINCÓN - LE REGRESO AL SER AMADO." [level=3] [ref=e120]
+            - generic [ref=e121]: Boom Stand Up Bar
+            - generic [ref=e125]: Bogotá
+            - paragraph [ref=e126]: $ 25.000
+        - link "sáb, 12 de sept Presencial GORDO Y FEO PEREIRA Teatro Municipal Santiago Londoño Pereira $ 50.000" [ref=e127] [cursor=pointer]:
+          - /url: /eventos/gordo-y-feo-pereira
+          - generic [ref=e128]:
+            - generic [ref=e129]: sáb, 12 de sept
+            - generic [ref=e130]: Presencial
+          - generic [ref=e132]:
+            - heading "GORDO Y FEO PEREIRA" [level=3] [ref=e133]
+            - generic [ref=e134]: Teatro Municipal Santiago Londoño
+            - generic [ref=e138]: Pereira
+            - paragraph [ref=e139]: $ 50.000
+        - link "jue, 3 de sept Presencial GORDO Y FEO SOACHA Teatro Sua Soacha $ 50.000" [ref=e140] [cursor=pointer]:
+          - /url: /eventos/gordo-y-feo-soacha
+          - generic [ref=e141]:
+            - generic [ref=e142]: jue, 3 de sept
+            - generic [ref=e143]: Presencial
+          - generic [ref=e145]:
+            - heading "GORDO Y FEO SOACHA" [level=3] [ref=e146]
+            - generic [ref=e147]: Teatro Sua
+            - generic [ref=e151]: Soacha
+            - paragraph [ref=e152]: $ 50.000
+    - generic [ref=e154]:
+      - generic [ref=e155]:
+        - heading "Artistas destacados" [level=2] [ref=e156]
+        - paragraph [ref=e157]: Descubre a los artistas más populares de la plataforma
+      - generic [ref=e158]:
+        - link "CHIMUELO Ver perfil" [ref=e159] [cursor=pointer]:
+          - /url: /artistas/chimuelo
+          - generic [ref=e163]:
+            - heading "CHIMUELO" [level=3] [ref=e164]
+            - generic [ref=e165]: Ver perfil
+        - link "Gabriel Murillo Ver perfil" [ref=e166] [cursor=pointer]:
+          - /url: /artistas/gabriel-murillo
+          - generic [ref=e171]:
+            - heading "Gabriel Murillo" [level=3] [ref=e172]
+            - generic [ref=e173]: Ver perfil
+    - generic [ref=e174]:
+      - generic [ref=e175]:
+        - heading "Venues populares" [level=2] [ref=e176]
+        - link "Explorar más →" [ref=e177] [cursor=pointer]:
+          - /url: /venues
+      - generic [ref=e178]:
+        - link "Teatro Guillermo Valencia Popayán 1 evento próximo" [ref=e179] [cursor=pointer]:
+          - /url: /venues/teatro-guillermo-valencia
+          - generic [ref=e183]:
+            - heading "Teatro Guillermo Valencia" [level=3] [ref=e184]
+            - paragraph [ref=e185]: Popayán
+            - paragraph [ref=e188]:
+              - text: "1"
+              - generic [ref=e189]: evento próximo
+        - link "Teatro Zea Mays Chía 1 evento próximo" [ref=e190] [cursor=pointer]:
+          - /url: /venues/teatro-zea-mays
+          - generic [ref=e194]:
+            - heading "Teatro Zea Mays" [level=3] [ref=e195]
+            - paragraph [ref=e196]: Chía
+            - paragraph [ref=e199]:
+              - text: "1"
+              - generic [ref=e200]: evento próximo
+        - link "Teatro Imperial Universidad de Nariño Pasto 1 evento próximo" [ref=e201] [cursor=pointer]:
+          - /url: /venues/teatro-imperial-udenar
+          - generic [ref=e205]:
+            - heading "Teatro Imperial Universidad de Nariño" [level=3] [ref=e206]
+            - paragraph [ref=e207]: Pasto
+            - paragraph [ref=e210]:
+              - text: "1"
+              - generic [ref=e211]: evento próximo
+        - link "Teatro Sua Soacha 1 evento próximo" [ref=e212] [cursor=pointer]:
+          - /url: /venues/teatro-sua-soacha
+          - generic [ref=e216]:
+            - heading "Teatro Sua" [level=3] [ref=e217]
+            - paragraph [ref=e218]: Soacha
+            - paragraph [ref=e221]:
+              - text: "1"
+              - generic [ref=e222]: evento próximo
+        - link "Teatro Calima Cali 1 evento próximo" [ref=e223] [cursor=pointer]:
+          - /url: /venues/teatro-calima
+          - generic [ref=e227]:
+            - heading "Teatro Calima" [level=3] [ref=e228]
+            - paragraph [ref=e229]: Cali
+            - paragraph [ref=e232]:
+              - text: "1"
+              - generic [ref=e233]: evento próximo
+        - link "Auditorio Municipal Mosquera Mosquera 1 evento próximo" [ref=e234] [cursor=pointer]:
+          - /url: /venues/auditorio-municipal-mosquera
+          - generic [ref=e238]:
+            - heading "Auditorio Municipal Mosquera" [level=3] [ref=e239]
+            - paragraph [ref=e240]: Mosquera
+            - paragraph [ref=e243]:
+              - text: "1"
+              - generic [ref=e244]: evento próximo
+    - contentinfo [ref=e245]:
+      - generic [ref=e246]:
+        - generic [ref=e247]:
+          - generic [ref=e248]:
+            - img "FreeTicket" [ref=e249]
+            - paragraph [ref=e252]: La plataforma de tickets y membresías para artistas independientes.
+            - generic [ref=e253]:
+              - link "Instagram" [ref=e254] [cursor=pointer]:
+                - /url: https://instagram.com/freeticketlat
+              - link "TikTok" [ref=e257] [cursor=pointer]:
+                - /url: https://www.tiktok.com/@freeticketlat
+              - link "YouTube" [ref=e260] [cursor=pointer]:
+                - /url: https://www.youtube.com/@freeticketlat
+          - generic [ref=e263]:
+            - heading "Plataforma" [level=4] [ref=e264]
+            - list [ref=e265]:
+              - listitem [ref=e266]:
+                - link "Explorar eventos" [ref=e267] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=e268]:
+                - link "Artistas" [ref=e269] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=e270]:
+                - link "Venues" [ref=e271] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=e272]:
+                - link "Comunidades" [ref=e273] [cursor=pointer]:
+                  - /url: "#"
+          - generic [ref=e274]:
+            - heading "Artistas" [level=4] [ref=e275]
+            - list [ref=e276]:
+              - listitem [ref=e277]:
+                - link "Crear cuenta" [ref=e278] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=e279]:
+                - link "Vender tickets" [ref=e280] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=e281]:
+                - link "Gestionar fans" [ref=e282] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=e283]:
+                - link "Panel admin" [ref=e284] [cursor=pointer]:
+                  - /url: "#"
+          - generic [ref=e285]:
+            - heading "Compañía" [level=4] [ref=e286]
+            - list [ref=e287]:
+              - listitem [ref=e288]:
+                - link "Sobre nosotros" [ref=e289] [cursor=pointer]:
+                  - /url: /nosotros
+              - listitem [ref=e290]:
+                - link "Novedades" [ref=e291] [cursor=pointer]:
+                  - /url: /novedades
+              - listitem [ref=e292]:
+                - link "Prensa" [ref=e293] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=e294]:
+                - link "Contacto" [ref=e295] [cursor=pointer]:
+                  - /url: /contacto
+          - generic [ref=e296]:
+            - heading "Desarrolladores" [level=4] [ref=e297]
+            - list [ref=e298]:
+              - listitem [ref=e299]:
+                - link "CLI (ft)" [ref=e300] [cursor=pointer]:
+                  - /url: https://github.com/AppFreeticket/agent-skills
+              - listitem [ref=e301]:
+                - link "Skill" [ref=e302] [cursor=pointer]:
+                  - /url: https://github.com/AppFreeticket/agent-skills
+              - listitem [ref=e303]:
+                - link "API pública" [ref=e304] [cursor=pointer]:
+                  - /url: https://github.com/AppFreeticket
+              - listitem [ref=e305]:
+                - link "GitHub" [ref=e306] [cursor=pointer]:
+                  - /url: https://github.com/AppFreeticket
+          - generic [ref=e307]:
+            - heading "Legal" [level=4] [ref=e308]
+            - list [ref=e309]:
+              - listitem [ref=e310]:
+                - link "Términos generales" [ref=e311] [cursor=pointer]:
+                  - /url: /legal/terminos-generales
+              - listitem [ref=e312]:
+                - link "Compra de tickets" [ref=e313] [cursor=pointer]:
+                  - /url: /legal/compra-tickets
+              - listitem [ref=e314]:
+                - link "Servicio B2B" [ref=e315] [cursor=pointer]:
+                  - /url: /legal/servicio-b2b
+              - listitem [ref=e316]:
+                - link "Privacidad" [ref=e317] [cursor=pointer]:
+                  - /url: /legal/privacidad
+              - listitem [ref=e318]:
+                - link "Centro legal" [ref=e319] [cursor=pointer]:
+                  - /url: /legal
+        - generic [ref=e320]:
+          - generic [ref=e321]: © 2026 FreeTicket. Todos los derechos reservados.
+          - generic [ref=e322]: Hecho con amor en Colombia
+  - region "Notifications alt+T"
+  - alert [ref=e323]

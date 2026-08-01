@@ -59,6 +59,27 @@ del show. El token va firmado con HMAC, sin base de datos que limpiar.
 está 10 minutos **antes** de la hora de inicio. Alimenta el personal
 sugerido del link de puerta.
 
+## El escáner de puerta
+
+[`web/escaner.html`](web/escaner.html) — **funciona**, no es una maqueta.
+Lee el QR con la cámara (`BarcodeDetector`), valida contra el ingest, y
+mueve el contador de aforo contra la proyección de ese show.
+
+```bash
+QR_SECRET=demo python3 scripts/mock_ingest.py 8788   # la Lambda, en memoria
+QR_SECRET=demo python3 scripts/qr_demo.py --n 5 --png   # entradas firmadas de prueba
+cd web && python3 -m http.server 8777
+# abrir http://localhost:8777/escaner.html?api=http://localhost:8788
+```
+
+Probado de punta a punta contra el ingest: entrada válida → `ok`, la misma
+otra vez → `duplicado`, firma alterada → `firma_invalida`, y **al cortar la
+red el escaneo queda en cola y se sube solo cuando vuelve** — el aforo pasó
+de 3 a 4 sin que la puerta se detuviera.
+
+Safari no trae `BarcodeDetector`; ahí el campo «a mano» hace el mismo
+recorrido. En Chrome (escritorio y Android) la cámara funciona.
+
 ## Lo que va más allá del reto
 
 El reto pide proyectar mejor. Debajo hay un problema más grande:
