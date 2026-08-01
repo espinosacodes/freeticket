@@ -1,0 +1,28 @@
+{
+  "name": "hackathon-freeticket",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "ft-hack": "./bin/ft-hack.mjs"
+  },
+  "scripts": {
+    "generate": "node scripts/generate.mjs",
+    "load": "CARGAR=1 node scripts/load.mjs",
+    "functions": "DESPLEGAR=1 node scripts/build-functions.mjs",
+    "verify": "node scripts/verify.mjs",
+    "slides": "open slides/index.html",
+    "web": "node scripts/build-web.mjs",
+    "deploy": "node scripts/build-web.mjs && vercel deploy --prod"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "description": "Datos del hackathon FreeTicket: CLI y API para cruzar Boom con la tiquetera y proyectar asistencia.",
+  "files": [
+    "bin",
+    "scripts/build-functions.mjs",
+    "SKILL.md",
+    "README.md"
+  ]
+}

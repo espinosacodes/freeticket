@@ -1,0 +1,39 @@
+node_modules/
+raw/
+# La data NO vive en el repo: se consulta por el CLI o por el API pública.
+# Aquí solo queda el generador, para que el organizador la pueda regenerar.
+data/
+# Token del participante: personal, no se comparte.
+.ft-hack.json
+# El deck del brief es del organizador: se proyecta el sábado, no se publica.
+slides/
+
+# InsForge & AI agent skills
+.insforge
+.agent
+.agents
+.augment
+.claude
+.cline
+.github/copilot*
+.kilocode
+.qoder
+.qwen
+.roo
+.trae
+.windsurf
+
+# InsForge — credenciales, nunca al repo
+.insforge/
+.env.local
+.DS_Store
+
+# Vercel
+.vercel
+
+# Python (local)
+secrets/
+.env
+__pycache__/
+.venv/
+*.pyc
