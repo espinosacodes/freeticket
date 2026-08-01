@@ -24,15 +24,20 @@ API = "https://api.openai.com/v1/audio/speech"
 # gpt-4o-mini-tts acepta instrucciones de interpretación, no solo texto.
 # Esto es lo que separa una voz de robot de una que convence.
 INSTRUCCIONES = (
-    "Hablá en español latinoamericano neutro, con acento colombiano suave. "
-    "Tono de alguien que conoce el negocio y está mostrando algo que funciona: "
-    "seguro, directo, sin entusiasmo de comercial ni voz de tutorial. "
-    "Ritmo pausado, con una pausa breve después de cada pregunta. "
-    "Bajá el tono al final de cada frase, como quien afirma, no como quien vende."
+    "Español latinoamericano neutro, acento colombiano de Bogotá, suave. "
+    "Sos una persona real mostrándole a un colega algo que acabás de construir "
+    "y que funciona: cercano, tranquilo, con una media sonrisa en la voz. "
+    "NO es un comercial, NO es un tutorial, NO es un locutor. "
+    "Ritmo conversacional, no uniforme: acelerá levemente en lo que ya se sabe "
+    "y frená en el dato que importa. Dejá respirar entre frases, y una pausa "
+    "más larga después de cada pregunta, como esperando la respuesta. "
+    "Bajá el tono al cerrar cada frase, como quien constata un hecho. "
+    "Las cifras se dicen despacio y claras. Nada de énfasis exagerado."
 )
 
-# alloy/echo/fable/onyx/nova/shimmer · onyx = grave y con autoridad
-VOZ_POR_DEFECTO = "onyx"
+# ash/ballad/coral/sage/verse son las voces nuevas y mucho más
+# naturales que alloy/onyx/nova. ash = masculina, cálida, conversacional.
+VOZ_POR_DEFECTO = "ash"
 
 
 def tramos_del_guion(path):
