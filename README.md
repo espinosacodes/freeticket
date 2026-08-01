@@ -31,6 +31,7 @@ cd web && python3 -m http.server 8777    # http://localhost:8777
 | [`out/matches.csv`](out/matches.csv) | `sale_id, boom_user_id, confidence` |
 | [`out/forecast.csv`](out/forecast.csv) | `event_id, expected_attendance, p10, p90` — solo agosto |
 | [`NOTAS.md`](NOTAS.md) | qué asumí, qué señal pesó más, qué haría con 4 horas más |
+| [`DEMO.md`](DEMO.md) | el guion de la demo y las respuestas a las preguntas difíciles |
 | `out/matches_auditoria.csv` | lo mismo que `matches.csv` **más la evidencia** de cada match |
 | `out/arrival_curve.csv` | la curva de llegada, medida sobre 4.969 check-ins de julio |
 

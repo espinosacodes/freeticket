@@ -1,0 +1,255 @@
+/* ============================================================
+   FreeTicket — sistema de diseño del tablero
+   Tokens tomados de appfreeticket.com (marca) + paleta de datos
+   validada con el validador de contraste/CVD (ver NOTAS.md).
+   ============================================================ */
+
+/* Archivo (la tipografía de la marca) se carga con <link> desde cada página;
+   si no llega, cae al stack del sistema sin romper el layout. */
+
+:root {
+  color-scheme: light;
+
+  /* --- marca --- */
+  --ft-yellow:      #ffd102;
+  --ft-yellow-ink:  #070707;
+  --ft-teal:        #1ebbb2;
+  --ft-purple:      #5615c1;
+  --ft-live:        #ff4d2e;
+
+  /* --- superficies / tinta --- */
+  --bg:        #ffffff;
+  --surface:   #ffffff;
+  --surface-2: #f5f5f5;
+  --surface-3: #ececec;
+  --ink:       #070707;
+  --ink-2:     #717182;
+  --ink-3:     #9a9aa6;
+  --border:    #e0e0e0;
+  --border-2:  #d2d2d2;
+
+  /* --- serie de datos: escalera de tipo de entrada (ordinal, hue teal) --- */
+  --tier-1: #2dcac0;   /* General      */
+  --tier-2: #1f857f;   /* Preferencial */
+  --tier-3: #084743;   /* VIP          */
+  --cortesia: #aa5ef6; /* Cortesía (categórico, hue purple) */
+
+  /* --- serie única (curva, barras simples) --- */
+  --series:      #1f857f;
+  --series-soft: #1f857f1f;
+
+  /* --- estado (reservado, nunca como serie) --- */
+  --ok:       #12864a;
+  --warn:     #a86a00;
+  --warn-bg:  #ffd102;
+  --danger:   #d3352f;
+
+  /* --- forma --- */
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 20px;
+  --r-pill: 999px;
+  --glow-yellow: 0 6px 22px -6px #ffd10285;
+  --shadow-1: 0 1px 2px #0000000d, 0 1px 3px #0000000f;
+  --shadow-2: 0 4px 20px -4px #0000001a;
+
+  /* --- movimiento --- */
+  --ease: cubic-bezier(.22, 1, .36, 1);
+  --dur: .5s;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg:        #070707;
+  --surface:   #101010;
+  --surface-2: #171717;
+  --surface-3: #1f1f1f;
+  --ink:       #ffffff;
+  --ink-2:     #a1a1ac;
+  --ink-3:     #6f6f7a;
+  --border:    #262626;
+  --border-2:  #333333;
+
+  /* la rampa invierte ancla en oscuro: el énfasis sigue creciendo con el tier */
+  --tier-1: #12524e;
+  --tier-2: #20a099;
+  --tier-3: #3af5ea;
+  --cortesia: #8e40d7;
+
+  --series:      #20a099;
+  --series-soft: #20a09926;
+
+  --ok:      #35c07a;
+  --warn:    #ffd102;
+  --danger:  #ff6b5e;
+  --shadow-1: 0 1px 2px #00000059;
+  --shadow-2: 0 8px 28px -6px #00000080;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg:        #070707;
+    --surface:   #101010;
+    --surface-2: #171717;
+    --surface-3: #1f1f1f;
+    --ink:       #ffffff;
+    --ink-2:     #a1a1ac;
+    --ink-3:     #6f6f7a;
+    --border:    #262626;
+    --border-2:  #333333;
+    --tier-1: #12524e;
+    --tier-2: #20a099;
+    --tier-3: #3af5ea;
+    --cortesia: #8e40d7;
+    --series:      #20a099;
+    --series-soft: #20a09926;
+    --ok:      #35c07a;
+    --warn:    #ffd102;
+    --danger:  #ff6b5e;
+    --shadow-1: 0 1px 2px #00000059;
+    --shadow-2: 0 8px 28px -6px #00000080;
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: Archivo, ui-sans-serif, -apple-system, 'Segoe UI', system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* La marca usa Archivo Black (900) para todo titular. */
+h1, h2, h3, .display {
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  margin: 0;
+}
+
+a { color: inherit; }
+
+:where(a, button, select, input, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--ft-yellow);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ---------- piezas ---------- */
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-1);
+}
+
+/* Firma de la marca: filete de color arriba de la tarjeta. */
+.card--accent { position: relative; overflow: hidden; }
+.card--accent::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background: var(--accent-line, var(--ft-yellow));
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: .01em;
+  padding: 3px 10px;
+  border-radius: var(--r-pill);
+  background: var(--surface-2);
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+.badge--yellow { background: var(--ft-yellow); color: var(--ft-yellow-ink); }
+.badge--outline { background: transparent; border: 1px solid var(--border-2); }
+.badge--live { background: var(--ft-live); color: #fff; }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font: inherit;
+  font-weight: 900;
+  font-size: 14px;
+  padding: 10px 20px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--border-2);
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+  transition: background .18s var(--ease), border-color .18s var(--ease),
+              transform .18s var(--ease), box-shadow .18s var(--ease);
+}
+.btn:hover { background: var(--surface-2); }
+.btn:active { transform: translateY(1px); }
+.btn--primary {
+  background: var(--ft-yellow);
+  border-color: var(--ft-yellow);
+  color: var(--ft-yellow-ink);
+  box-shadow: var(--glow-yellow);
+}
+.btn--primary:hover { background: #ffdb3a; border-color: #ffdb3a; }
+
+/* números: tabular sólo donde se alinean en columna (tablas, ejes) */
+.tnum { font-variant-numeric: tabular-nums; }
+/* cifras protagonistas: proporcionales, se ven mejor a tamaño display */
+.pnum { font-variant-numeric: proportional-nums; }
+
+.muted { color: var(--ink-2); }
+.dim   { color: var(--ink-3); }
+
+/* ---------- movimiento ---------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
+  transition-delay: var(--d, 0ms);
+}
+.reveal.in { opacity: 1; transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal { opacity: 1; transform: none; }
+}
+
+/* ---------- tooltip compartido ---------- */
+.tip {
+  position: fixed;
+  z-index: 40;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .12s var(--ease);
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--border-2);
+  border-radius: var(--r-sm);
+  padding: 9px 11px;
+  font-size: 12.5px;
+  line-height: 1.45;
+  box-shadow: var(--shadow-2);
+  font-variant-numeric: tabular-nums;
+  max-width: 260px;
+}
+.tip.on { opacity: 1; }
+.tip b { display: block; font-weight: 900; margin-bottom: 3px; }
+.tip .k { display: inline-flex; align-items: center; gap: 6px; }
+.tip i { width: 9px; height: 9px; border-radius: 2px; display: inline-block; flex: none; }
