@@ -44,7 +44,6 @@ __pycache__/
 *.key
 *.cer
 *.certSigningRequest
-out/
 *.pkpass
 
 # Cache de geocoding — regenerable

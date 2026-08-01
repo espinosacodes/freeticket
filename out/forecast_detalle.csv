@@ -1,0 +1,31 @@
+event_id,expected_attendance,p10,p90,tickets_sold,capacity,title,venue,city,starts_at,is_residency,expected_rate
+ft_evt_0040,99,95,104,118,150,Trasnoche Cali — residencia sábado,Sala Beethoven,Cali,2026-08-01T20:00:00+00:00,true,0.8418
+ft_evt_0058,90,80,101,232,250,Roast de Medianoche — Comedia sin Red,Teatro Colsubsidio,Bogotá,2026-08-04T19:30:00+00:00,false,0.3898
+ft_evt_0014,73,67,80,120,220,Micrófono Suelto — residencia martes,Ace of Clubs,Bogotá,2026-08-04T20:00:00+00:00,true,0.6123
+ft_evt_0032,156,150,162,201,250,La Bodega Improvisa — residencia miércoles,La Bodega del Chiste,Bogotá,2026-08-05T20:00:00+00:00,true,0.776
+ft_evt_0023,167,162,172,192,250,Doble Sentido — residencia jueves,La Pascasia,Medellín,2026-08-06T20:30:00+00:00,true,0.8681
+ft_evt_0056,355,349,362,378,450,Sin Filtro — Especial de Improvisación,Teatro Metropolitano,Medellín,2026-08-06T20:30:00+00:00,false,0.94
+ft_evt_0006,51,43,58,122,180,Mala Hora — residencia viernes,Casa E,Bogotá,2026-08-07T20:30:00+00:00,true,0.4152
+ft_evt_0052,318,308,329,436,800,Segunda Función — Especial de Improvisación,Teatro Santiago Londoño,Pereira,2026-08-07T20:30:00+00:00,false,0.7303
+ft_evt_0060,242,225,259,623,800,Sin Filtro — Material Nuevo,Teatro Colsubsidio,Bogotá,2026-08-08T19:30:00+00:00,false,0.3877
+ft_evt_0041,77,73,81,94,150,Trasnoche Cali — residencia sábado,Sala Beethoven,Cali,2026-08-08T20:30:00+00:00,true,0.8215
+ft_evt_0015,72,66,79,115,250,Micrófono Suelto — residencia martes,Ace of Clubs,Bogotá,2026-08-11T20:00:00+00:00,true,0.6295
+ft_evt_0033,76,72,79,88,180,La Bodega Improvisa — residencia miércoles,La Bodega del Chiste,Bogotá,2026-08-12T20:30:00+00:00,true,0.8598
+ft_evt_0024,67,64,71,80,150,Doble Sentido — residencia jueves,La Pascasia,Medellín,2026-08-13T20:30:00+00:00,true,0.8401
+ft_evt_0007,32,26,38,78,120,Mala Hora — residencia viernes,Casa E,Bogotá,2026-08-14T20:30:00+00:00,true,0.409
+ft_evt_0042,57,53,61,71,150,Trasnoche Cali — residencia sábado,Sala Beethoven,Cali,2026-08-15T20:00:00+00:00,true,0.8007
+ft_evt_0016,48,42,54,88,220,Micrófono Suelto — residencia martes,Ace of Clubs,Bogotá,2026-08-18T20:00:00+00:00,true,0.5469
+ft_evt_0048,165,158,171,210,450,Cuento Corto — Show de Temporada,Teatro Metropolitano,Medellín,2026-08-19T19:00:00+00:00,false,0.7838
+ft_evt_0062,103,92,114,286,600,Los del Fondo — Función Única,Teatro Jorge Isaacs,Cali,2026-08-19T19:30:00+00:00,false,0.3602
+ft_evt_0034,47,44,51,61,120,La Bodega Improvisa — residencia miércoles,La Bodega del Chiste,Bogotá,2026-08-19T20:00:00+00:00,true,0.7758
+ft_evt_0050,395,388,402,424,800,Sin Filtro — Especial de Improvisación,La Bodega del Chiste,Bogotá,2026-08-20T19:30:00+00:00,false,0.9316
+ft_evt_0025,89,86,93,98,220,Doble Sentido — residencia jueves,La Pascasia,Medellín,2026-08-20T20:00:00+00:00,true,0.9132
+ft_evt_0008,55,53,57,58,120,Mala Hora — residencia viernes,Casa E,Bogotá,2026-08-21T20:00:00+00:00,true,0.9442
+ft_evt_0046,328,318,337,427,1200,Tres Sillas — Función Única,Ace of Clubs,Bogotá,2026-08-22T19:30:00+00:00,false,0.7676
+ft_evt_0043,26,20,31,65,150,Trasnoche Cali — residencia sábado,Sala Beethoven,Cali,2026-08-22T20:00:00+00:00,true,0.3936
+ft_evt_0017,32,28,36,48,120,Micrófono Suelto — residencia martes,Ace of Clubs,Bogotá,2026-08-25T20:30:00+00:00,true,0.6636
+ft_evt_0054,105,94,117,273,800,Cuento Corto — Comedia sin Red,Teatro Colsubsidio,Bogotá,2026-08-26T19:30:00+00:00,false,0.3856
+ft_evt_0035,55,52,59,67,180,La Bodega Improvisa — residencia miércoles,La Bodega del Chiste,Bogotá,2026-08-26T20:30:00+00:00,true,0.8244
+ft_evt_0026,55,52,58,63,220,Doble Sentido — residencia jueves,La Pascasia,Medellín,2026-08-27T20:30:00+00:00,true,0.8775
+ft_evt_0009,35,33,36,37,120,Mala Hora — residencia viernes,Casa E,Bogotá,2026-08-28T20:30:00+00:00,true,0.9384
+ft_evt_0044,49,46,51,56,220,Trasnoche Cali — residencia sábado,Sala Beethoven,Cali,2026-08-29T20:00:00+00:00,true,0.8663
