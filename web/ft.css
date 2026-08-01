@@ -172,6 +172,7 @@ a { color: inherit; }
   background: var(--surface-2);
   color: var(--ink-2);
   white-space: nowrap;
+  text-decoration: none;
 }
 .badge--yellow { background: var(--ft-yellow); color: var(--ft-yellow-ink); }
 .badge--outline { background: transparent; border: 1px solid var(--border-2); }
@@ -183,6 +184,7 @@ a { color: inherit; }
   justify-content: center;
   gap: 8px;
   font: inherit;
+  text-decoration: none;
   font-weight: 900;
   font-size: 14px;
   padding: 10px 20px;
@@ -212,14 +214,16 @@ a { color: inherit; }
 .muted { color: var(--ink-2); }
 .dim   { color: var(--ink-3); }
 
-/* ---------- movimiento ---------- */
-.reveal {
+/* ---------- movimiento ----------
+   Sólo se esconde si el JS está vivo (html.js). Sin JS, o si el
+   IntersectionObserver falla, el contenido se ve igual. */
+.js .reveal {
   opacity: 0;
   transform: translateY(14px);
   transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
   transition-delay: var(--d, 0ms);
 }
-.reveal.in { opacity: 1; transform: none; }
+.js .reveal.in { opacity: 1; transform: none; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

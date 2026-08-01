@@ -70,13 +70,52 @@ midiendo contra ellos:
 71% sobre 7 eventos es 5 de 7. Con esa muestra no se distingue de 80%, y lo
 digo así en vez de redondear hacia arriba.
 
+## Los colores del tablero
+
+La marca (`appfreeticket.com`) da amarillo `#ffd102`, negro `#070707`,
+Archivo 900 para titulares y el filete de color arriba de cada tarjeta.
+Eso es identidad y se respeta tal cual.
+
+Los colores **de datos** son otra cosa: los tomé de la marca pero medidos,
+no a ojo. El amarillo y el morado de marca no pasan la banda de luminosidad
+OKLCH ni el piso de contraste, así que se corrieron manteniendo el tono:
+
+- **General → Preferencial → VIP** son una escalera de tiers, no cuatro
+  categorías sueltas. Van en **una sola rampa** del teal de marca
+  (`#2dcac0 → #1f857f → #084743`), monótona en luminosidad. Que el color
+  ordene es la información.
+- **Cortesía** es la que rompe la serie, y por eso lleva el morado de marca
+  (`#aa5ef6`). Separación mínima contra cualquier paso del teal: ΔE 17,6
+  bajo deuteranopía/protanopía y 28,2 en visión normal (los pisos son 8 y
+  15). Un show 100% cortesía se ve morado sólido de un vistazo.
+- En oscuro la rampa **invierte el ancla** (`#12524e → #20a099 → #3af5ea`)
+  para que el énfasis siga creciendo con el tier en vez de apagarse.
+
+El amarillo se reserva para una cosa a la vez: el CTA, el pico de la curva
+y el rango p10–p90. Si el amarillo estuviera en todos lados no señalaría
+nada. Los SVG referencian `var(--…)` y no hex resuelto, así que el gráfico
+sigue al tema —incluido un cambio de tema del sistema— sin repintar.
+
+## Qué ordené en el tablero
+
+Antes había **dos tablas de 30 filas** listando los mismos shows: una con
+la proyección y otra con la mezcla. Ahora es **una sola**, con la mezcla
+como barra apilada y los números detrás del botón "ver números de mezcla".
+El resto del orden sigue la pregunta, no el pipeline:
+
+1. la respuesta (una cifra: 3.519, con su rango y el backtest al lado),
+2. la curva de llegada — lo único accionable antes de armar turnos,
+3. el detalle show por show, con buscador, orden y filtro de cortesía,
+4. el método, al final, que es lo que se consulta cuando ya se dudó.
+
 ## Qué haría con cuatro horas más
 
-**Primero, lo que ya está especificado y no alcancé a desplegar:** el
-ingest de escaneos de `docs/01-scan-telemetry.md`. Es lo que convierte
-`checked_in` de campo digitado en hecho observado, y con eso la curva de
-llegada deja de ser aproximada y aparece una señal que hoy no existe —
-*pase instalado y nunca escaneado*, o sea intención sin asistencia.
+El ingest de escaneos de `docs/01-scan-telemetry.md` **quedó desplegado** —
+Lambda + API Gateway + DynamoDB, probado de punta a punta contra el
+endpoint real. Es lo que convierte `checked_in` de campo digitado en hecho
+observado, y con eso la curva de llegada deja de ser aproximada y aparece
+una señal que hoy no existe: *pase instalado y nunca escaneado*, o sea
+intención sin asistencia.
 
 Después, por orden de retorno:
 

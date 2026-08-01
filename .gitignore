@@ -51,3 +51,7 @@ __pycache__/
 
 # Hashes de imágenes en Pass2U — atados a la cuenta, regenerables
 .pass2u-images.json
+
+# Artefactos de navegador (screenshots y logs de Playwright)
+.playwright-mcp/
+freeticket-ref.png

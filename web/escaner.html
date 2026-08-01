@@ -1,91 +1,134 @@
 <!doctype html>
+<html lang="es" data-theme="dark">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>FreeTicket — escáner de puerta</title>
+<meta name="theme-color" content="#070707">
+<meta name="robots" content="noindex">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="apple-icon.png" sizes="180x180">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400..900&display=swap">
+<link rel="stylesheet" href="ft.css">
+
 <style>
-  *, *::before, *::after { box-sizing: border-box; }
-  :root {
-    color-scheme: dark;
-    --bg: #111110; --card: #1a1a19; --border: #33332f;
-    --ink: #fff; --ink2: #c3c2b7; --ink3: #94938a;
-    --accent: #3987e5; --ok: #199e70; --dup: #c98500; --bad: #e66767;
+  /* El escáner vive en oscuro: se usa de noche, en la puerta. */
+  body { padding: 0; }
+  .wrap { max-width: 480px; margin: 0 auto; padding: 16px 14px calc(40px + env(safe-area-inset-bottom)); }
+
+  .brandbar { display: flex; align-items: center; gap: 10px; margin: 0 2px 16px; }
+  .brandbar svg { height: 17px; width: auto; }
+  .brandbar .tag {
+    font-size: 11.5px; font-weight: 900; letter-spacing: .07em; text-transform: uppercase;
+    color: var(--ink-3); padding-left: 10px; border-left: 1px solid var(--border-2);
   }
-  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5
-         ui-sans-serif, -apple-system, "Segoe UI", system-ui, sans-serif; }
-  .wrap { max-width: 460px; margin: 0 auto; padding: 14px 14px 40px; }
+  .brandbar .sp { flex: 1; }
 
-  .top { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
-  .top select { flex: 1; min-width: 0; background: var(--card); color: var(--ink);
-                border: 1px solid var(--border); border-radius: 9px; padding: 9px 10px;
-                font-size: 14px; }
-  .net { font-size: 12px; padding: 4px 9px; border-radius: 999px;
-         border: 1px solid var(--border); color: var(--ink2); white-space: nowrap; }
-  .net.off { color: var(--dup); border-color: var(--dup); }
+  .top { display: flex; align-items: center; gap: 9px; margin-bottom: 12px; }
+  .top select {
+    flex: 1; min-width: 0; font: inherit; font-size: 13.5px; font-weight: 700;
+    background: var(--surface); color: var(--ink);
+    border: 1px solid var(--border-2); border-radius: var(--r-sm); padding: 10px 11px;
+  }
+  .net {
+    font-size: 11.5px; font-weight: 900; padding: 5px 11px; border-radius: var(--r-pill);
+    border: 1px solid var(--border-2); color: var(--ink-2); white-space: nowrap;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .net::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--ok); }
+  .net.off { color: var(--warn); border-color: #ffd10259; }
+  .net.off::before { background: var(--warn); }
 
-  .count { background: var(--card); border: 1px solid var(--border); border-radius: 14px;
-           padding: 16px 18px; margin-bottom: 12px; }
-  .count .n { font-size: 44px; font-weight: 650; line-height: 1;
-              letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
-  .count .l { color: var(--ink2); font-size: 14px; margin-top: 4px; }
-  .track { height: 8px; border-radius: 4px; background: var(--border);
-           margin-top: 12px; overflow: hidden; }
-  .track > div { height: 100%; background: var(--accent); width: 0; transition: width .3s; }
+  .count { padding: 18px 20px; margin-bottom: 12px; --accent-line: var(--ft-yellow); }
+  .count .n {
+    font-size: 46px; font-weight: 900; line-height: 1; letter-spacing: -.045em;
+    font-variant-numeric: proportional-nums;
+  }
+  .count .n .of { font-size: 20px; color: var(--ink-3); letter-spacing: -.02em; }
+  .count .l { color: var(--ink-2); font-size: 13px; margin-top: 6px; }
+  .track { height: 8px; border-radius: 4px; background: var(--surface-3); margin-top: 14px; overflow: hidden; }
+  .track > div { height: 100%; border-radius: 4px; background: var(--ft-yellow); width: 0;
+                 transition: width .45s var(--ease); }
 
+  /* overflow:hidden recorta el velo del retículo al recuadro de la cámara;
+     sin esto el box-shadow de 2000px oscurece la página entera. */
+  .camwrap { position: relative; margin-bottom: 12px; overflow: hidden; border-radius: var(--r-md); }
   #cam { width: 100%; aspect-ratio: 1; object-fit: cover; background: #000;
-         border-radius: 14px; display: block; }
-  .camwrap { position: relative; margin-bottom: 12px; }
-  .reticle { position: absolute; inset: 18%; border: 2px solid rgba(255,255,255,.55);
-             border-radius: 14px; pointer-events: none; }
-  .flash { position: absolute; inset: 0; border-radius: 14px; opacity: 0;
-           pointer-events: none; transition: opacity .18s; }
-  .flash.on { opacity: .55; }
+         border-radius: var(--r-md); display: block; border: 1px solid var(--border); }
+  .reticle {
+    position: absolute; inset: 17%; border-radius: var(--r-md); pointer-events: none;
+    box-shadow: 0 0 0 2px #ffd10285, 0 0 0 2000px #00000059;
+  }
+  .flash { position: absolute; inset: 0; border-radius: var(--r-md); opacity: 0;
+           pointer-events: none; transition: opacity .18s var(--ease); }
+  .flash.on { opacity: .5; }
 
-  button { font: inherit; border-radius: 10px; border: 1px solid var(--border);
-           background: var(--card); color: var(--ink); padding: 11px 14px;
-           cursor: pointer; }
-  button.primary { background: var(--accent); border-color: var(--accent);
-                   color: #fff; font-weight: 600; width: 100%; }
   .row { display: flex; gap: 8px; margin-bottom: 12px; }
-  .row input { flex: 1; min-width: 0; background: var(--card); color: var(--ink);
-               border: 1px solid var(--border); border-radius: 10px; padding: 11px 12px;
-               font-family: ui-monospace, monospace; font-size: 13px; }
+  .row input {
+    flex: 1; min-width: 0; font: inherit; background: var(--surface); color: var(--ink);
+    border: 1px solid var(--border-2); border-radius: var(--r-sm); padding: 11px 12px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px;
+  }
+  .row input::placeholder { color: var(--ink-3); }
+  .btn--wide { width: 100%; padding: 13px 20px; font-size: 15px; }
 
-  .banner { border-radius: 12px; padding: 14px 16px; margin-bottom: 12px;
-            font-weight: 600; display: none; }
-  .banner.show { display: block; }
-  .banner .s { font-weight: 400; font-size: 13.5px; opacity: .9; margin-top: 2px; }
-  .b-ok  { background: var(--ok);  color: #fff; }
-  .b-dup { background: var(--dup); color: #1a1a19; }
-  .b-bad { background: var(--bad); color: #1a1a19; }
+  .banner {
+    border-radius: var(--r-md); padding: 15px 17px; margin-bottom: 12px;
+    font-weight: 900; font-size: 17px; letter-spacing: -.02em; display: none;
+    align-items: center; gap: 12px;
+  }
+  .banner.show { display: flex; }
+  .banner .ic { font-size: 22px; line-height: 1; flex: none; }
+  .banner .s { font-weight: 500; font-size: 13px; letter-spacing: 0; opacity: .92; margin-top: 1px; }
+  .b-ok  { background: var(--ok);   color: #04140b; }
+  .b-dup { background: var(--ft-yellow); color: var(--ft-yellow-ink); }
+  .b-bad { background: var(--danger); color: #fff; }
 
+  h2 { font-size: 11px; text-transform: uppercase; letter-spacing: .08em;
+       color: var(--ink-3); margin: 20px 0 8px; }
   ul { list-style: none; margin: 0; padding: 0; }
-  li { display: flex; justify-content: space-between; gap: 10px; padding: 9px 2px;
-       border-top: 1px solid var(--border); font-size: 13.5px; }
-  li .t { font-family: ui-monospace, monospace; color: var(--ink2); }
-  li .r { font-weight: 600; white-space: nowrap; }
-  .r-ok { color: var(--ok); } .r-dup { color: var(--dup); } .r-bad { color: var(--bad); }
-  .r-q  { color: var(--ink3); }
-  h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .07em;
-       color: var(--ink3); margin: 18px 0 6px; }
-  .hint { color: var(--ink3); font-size: 12.5px; margin: 8px 0 0; }
-  details { margin-top: 18px; }
-  summary { color: var(--ink3); font-size: 13px; cursor: pointer; }
-  details .row { margin-top: 10px; }
+  li { display: flex; justify-content: space-between; gap: 10px; padding: 10px 2px;
+       border-top: 1px solid var(--border); font-size: 13px; }
+  li .t { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--ink-2); }
+  li .r { font-weight: 900; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; }
+  li .r::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+  .r-ok { color: var(--ok); } .r-dup { color: var(--warn); }
+  .r-bad { color: var(--danger); } .r-q { color: var(--ink-3); }
+
+  .hint { color: var(--ink-3); font-size: 12.5px; margin: 10px 0 0; }
+  details { margin-top: 22px; border-top: 1px solid var(--border); padding-top: 14px; }
+  summary { color: var(--ink-3); font-size: 12.5px; font-weight: 700; cursor: pointer; }
+  details .row { margin-top: 12px; }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .92em;
+         background: var(--surface-2); padding: 1px 5px; border-radius: 5px; }
 </style>
 
 <div class="wrap">
+  <div class="brandbar">
+    <svg viewBox="0 0 118 21" fill="none" xmlns="http://www.w3.org/2000/svg" role="img">
+      <title>FreeTicket</title>
+      <path d="M56.3915 2.34184V6.50696H53.293V7.69283H56.3915V16.3993C56.3915 19.205 57.3948 20.9983 60.4934 20.9983C61.4082 20.9983 62.323 20.709 63.2379 20.2753L62.7361 19.1181C61.9984 19.4653 61.2016 19.6966 60.4934 19.6966C58.2211 19.6966 57.8079 18.3373 57.8079 16.3993V7.69283H62.7656V6.50696H57.8079V2.19714L56.3915 2.34184ZM66.1101 6.44916V20.7958H64.6641V6.44916H66.1101ZM64.2509 1.85011C64.2509 3.35424 66.5822 3.35424 66.5822 1.85011C66.5822 0.346058 64.2509 0.346058 64.2509 1.85011ZM79.783 17.8455C78.6026 19.0026 77.009 19.61 75.445 19.61C72.1398 19.61 69.3658 17.4983 69.3658 13.6514C69.3658 9.80446 72.1398 7.69283 75.445 7.69283C77.009 7.69283 78.632 8.24252 79.8125 9.39946L80.7568 8.50282C79.2814 7.08542 77.3631 6.36234 75.445 6.36234C71.2251 6.36234 67.9494 9.13917 67.9494 13.6514C67.9494 18.1636 71.343 20.9405 75.445 20.9405C77.3631 20.9405 79.2814 20.2463 80.7568 18.8L79.783 17.8455ZM82.2716 0.519531V20.7958H83.688V13.7961L91.5082 20.7958H93.3379V20.709L85.1046 13.2464L92.482 6.56484V6.50696H90.5639L83.688 12.7548V0.519531H82.2716ZM100.341 20.9983C102.673 20.9983 105.211 20.0727 106.627 18.2505L105.594 17.4405C104.502 18.8579 102.26 19.61 100.341 19.61C97.3314 19.61 94.705 17.672 94.4099 14.3167H107.542C108.103 8.73417 104.443 6.2756 100.341 6.2756C96.2397 6.2756 92.9345 9.37053 92.9345 13.6514C92.9345 18.1926 96.2397 20.9983 100.341 20.9983ZM94.4099 13.0729C94.7346 9.57311 97.3314 7.57724 100.341 7.57724C103.853 7.57724 106.214 9.54417 106.243 13.0729H94.4099ZM111.152 2.34184V6.50696H108.053V7.69283H111.152V16.3993C111.152 19.205 112.155 20.9983 115.254 20.9983C116.169 20.9983 117.083 20.709 117.998 20.2753L117.497 19.1181C116.759 19.4653 115.962 19.6966 115.254 19.6966C112.982 19.6966 112.568 18.3373 112.568 16.3993V7.69283H117.526V6.50696H112.568V2.19714L111.152 2.34184Z" fill="currentColor"/>
+      <path d="M6.24968 20.6234V9.64547H10.4843V6.54613H6.24968V5.59039C6.24968 3.85237 7.18423 3.04135 8.41076 3.04135C9.14086 3.04135 9.84168 3.30214 10.6011 3.79445L11.9152 1.15868C10.7471 0.405432 9.43291 0 8.1771 0C5.28592 0 2.6868 1.76691 2.6868 5.59039V6.54613H0V9.64547H2.6868V20.6234H6.24968ZM11.6483 6.34348V20.6234H15.2112V13.0924C15.2112 10.4565 16.9342 9.47171 18.8033 9.47171C19.9713 9.47171 20.643 9.79027 21.3731 10.3986L22.9794 7.32826C22.1908 6.54612 20.7599 5.96693 19.2705 5.96693C17.8102 5.96693 16.3209 6.22757 15.2112 7.99448L14.9483 6.34348H11.6483ZM37.2559 14.7434C37.8109 8.86349 34.8028 5.90894 29.9842 5.90894C25.3116 5.90894 22.3328 9.03717 22.3328 13.3821C22.3328 17.9586 25.2825 21 30.247 21C32.4374 21 34.9197 20.2469 36.4382 18.6828L34.1604 16.4525C33.3426 17.2924 31.6197 17.7849 30.3055 17.7849C27.7938 17.7849 26.2461 16.5103 26.0124 14.7434H37.2559ZM26.0709 11.818C26.5965 9.96417 28.1735 9.03717 30.101 9.03717C32.1453 9.03717 33.6054 9.96417 33.8391 11.818H26.0709ZM52.9343 14.7434C53.4893 8.86349 50.4812 5.90894 45.6626 5.90894C40.99 5.90894 38.0112 9.03717 38.0112 13.3821C38.0112 17.9586 40.9608 21 45.9254 21C48.1158 21 50.598 20.2469 52.1166 18.6828L49.8388 16.4525C49.0211 17.2924 47.2981 17.7849 45.9839 17.7849C43.4723 17.7849 41.9246 16.5103 41.6908 14.7434H52.9343ZM41.7493 11.818C42.275 9.96417 43.8519 9.03717 45.7794 9.03717C47.8237 9.03717 49.2839 9.96417 49.5176 11.818H41.7493Z" fill="#F9D402"/>
+    </svg>
+    <span class="tag">Escáner</span>
+    <span class="sp"></span>
+    <a class="badge badge--outline" href="./" style="text-decoration:none">Tablero</a>
+  </div>
+
   <div class="top">
-    <select id="ev"></select>
+    <select id="ev" aria-label="Show"></select>
     <span class="net" id="net">en línea</span>
   </div>
 
-  <div class="count">
-    <div class="n"><span id="in">0</span> <span style="font-size:20px;color:var(--ink3)">/ <span id="exp">–</span></span></div>
+  <div class="card count card--accent">
+    <div class="n"><span id="in">0</span> <span class="of">/ <span id="exp">–</span></span></div>
     <div class="l" id="lbl">adentro · esperados</div>
     <div class="track"><div id="bar"></div></div>
   </div>
 
-  <div class="banner" id="ban"></div>
+  <div class="banner" id="ban" role="status" aria-live="assertive"></div>
 
   <div class="camwrap">
     <video id="cam" playsinline muted></video>
@@ -93,13 +136,13 @@
     <div class="flash" id="flash"></div>
   </div>
 
-  <button class="primary" id="start">Encender la cámara</button>
+  <button class="btn btn--primary btn--wide" id="start">Encender la cámara</button>
   <p class="hint" id="camhint"></p>
 
   <h2>A mano</h2>
   <div class="row">
-    <input id="manual" placeholder="FT1.ft_tkt_0000001.ft_evt_0031.…" autocomplete="off">
-    <button id="send">Validar</button>
+    <input id="manual" placeholder="FT1.ft_tkt_0000001.ft_evt_0031.…" autocomplete="off" aria-label="Código a mano">
+    <button class="btn" id="send">Validar</button>
   </div>
 
   <h2>Últimos escaneos</h2>
@@ -108,8 +151,8 @@
   <details>
     <summary>Configuración</summary>
     <div class="row">
-      <input id="api" placeholder="https://…lambda-url.us-east-1.on.aws/">
-      <button id="saveapi">Guardar</button>
+      <input id="api" placeholder="https://…lambda-url.us-east-1.on.aws/" aria-label="Endpoint del ingest">
+      <button class="btn" id="saveapi">Guardar</button>
     </div>
     <p class="hint">Endpoint del ingest. Se guarda en este teléfono. También se puede pasar por <code>?api=</code>.</p>
   </details>
@@ -120,8 +163,11 @@ const $ = s => document.querySelector(s);
 const LS_API = 'ft_api', LS_Q = 'ft_queue', LS_DEV = 'ft_device';
 
 const qs = new URLSearchParams(location.search);
+// Endpoint desplegado. Se puede sobreescribir con ?api= o desde
+// Configuración, para apuntar al mock local (scripts/mock_ingest.py).
+const API_POR_DEFECTO = 'https://1q5q7pqmx9.execute-api.us-east-1.amazonaws.com';
 if (qs.get('api')) localStorage.setItem(LS_API, qs.get('api'));
-let API = localStorage.getItem(LS_API) || '';
+let API = localStorage.getItem(LS_API) || API_POR_DEFECTO;
 $('#api').value = API;
 
 let DEVICE = localStorage.getItem(LS_DEV);
@@ -181,6 +227,7 @@ setInterval(refreshAforo, 15000);
 
 // ---------- feedback ----------
 const CLS = { ok: 'b-ok', duplicado: 'b-dup', ya_recibido: 'b-dup', encolado: 'b-dup' };
+const ICO = { ok: '✓', duplicado: '↺', ya_recibido: '↺', encolado: '⇡' };
 const TXT = {
   ok: ['Adelante', 'entrada válida'],
   duplicado: ['Ya entró', 'este pase se escaneó antes'],
@@ -195,9 +242,10 @@ function banner(result) {
   const [t, s] = TXT[result] || ['Error', result];
   const b = $('#ban');
   b.className = 'banner show ' + (CLS[result] || 'b-bad');
-  b.innerHTML = t + '<div class="s">' + s + '</div>';
+  b.innerHTML = '<span class="ic">' + (ICO[result] || '✕') + '</span>' +
+                '<span>' + t + '<div class="s">' + s + '</div></span>';
   const f = $('#flash');
-  f.style.background = result === 'ok' ? 'var(--ok)' : (CLS[result] ? 'var(--dup)' : 'var(--bad)');
+  f.style.background = result === 'ok' ? 'var(--ok)' : (CLS[result] ? 'var(--ft-yellow)' : 'var(--danger)');
   f.classList.add('on'); setTimeout(() => f.classList.remove('on'), 180);
   if (navigator.vibrate) navigator.vibrate(result === 'ok' ? 40 : [60, 50, 60]);
   clearTimeout(banner.t); banner.t = setTimeout(() => b.classList.remove('show'), 2600);
@@ -326,3 +374,4 @@ $('#saveapi').onclick = () => {
 
 net(); flush();
 </script>
+</html>

@@ -42,7 +42,8 @@ jobs:
 
       - name: Verificar que el sitio está completo
         run: |
-          for f in web/index.html web/puerta.html web/data.json; do
+          for f in web/index.html web/puerta.html web/escaner.html \
+                   web/ft.css web/favicon.svg web/data.json; do
             test -s "$f" || { echo "Falta $f"; exit 1; }
           done
           python3 -c "import json;d=json.load(open('web/data.json'));assert d['events'],'data.json sin eventos';print(len(d['events']),'eventos')"

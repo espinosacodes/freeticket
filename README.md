@@ -60,6 +60,26 @@ del show. El token va firmado con HMAC, sin base de datos que limpiar.
 está 10 minutos **antes** de la hora de inicio. Alimenta el personal
 sugerido del link de puerta.
 
+## Desplegado y funcionando
+
+| | |
+|---|---|
+| Tablero, puerta y escáner | https://espinosacodes.github.io/freeticket/ |
+| Ingest de escaneos | `https://1q5q7pqmx9.execute-api.us-east-1.amazonaws.com` |
+
+El ingest es **real**: Lambda + API Gateway + DynamoDB, probado de punta a
+punta. Se puede comprobar sin credenciales:
+
+```bash
+curl https://1q5q7pqmx9.execute-api.us-east-1.amazonaws.com/salud
+curl 'https://1q5q7pqmx9.execute-api.us-east-1.amazonaws.com/aforo?event_id=ft_evt_0040'
+```
+
+Dos guardarraíles de la organización de AWS nos obligaron a desviarnos —
+las Lambda Function URL públicas y `sts:AssumeRoleWithWebIdentity` están
+bloqueados en esta cuenta. Cómo se diagnosticó y qué se hizo en cambio está
+en [`docs/05-despliegue.md`](docs/05-despliegue.md).
+
 ## El escáner de puerta
 
 [`web/escaner.html`](web/escaner.html) — **funciona**, no es una maqueta.
@@ -102,6 +122,7 @@ el dato**:
 | [`docs/02-wallet-passes.md`](docs/02-wallet-passes.md) | Google Wallet (funcionando) y Apple (bloqueado, y por qué) |
 | [`docs/03-puerta.md`](docs/03-puerta.md) | la spec del link efímero |
 | [`docs/04-metricas.md`](docs/04-metricas.md) | las 6 métricas de operación que hoy no existen |
+| [`docs/05-despliegue.md`](docs/05-despliegue.md) | qué está corriendo, y los dos bloqueos de AWS que sorteamos |
 
 `wallet_pass.py` genera pases de Google Wallet reales: la clase se crea una
 vez por show y cada entrada se firma como JWT, así que emitir 500 pases
