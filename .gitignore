@@ -55,3 +55,9 @@ __pycache__/
 # Artefactos de navegador (screenshots y logs de Playwright)
 .playwright-mcp/
 freeticket-ref.png
+
+# Video de la demo: pesado y regenerable
+video/*.mp4
+video/*.webm
+video/*.mp3
+video/*.txt

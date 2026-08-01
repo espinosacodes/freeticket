@@ -334,8 +334,12 @@
         <div class="grow">
           <input class="field" id="q" type="search" placeholder="Buscar show, sala o ciudad…" aria-label="Buscar">
         </div>
+        <!-- Toda clave que se pueda ordenar desde la cabecera tiene que existir
+             aquí: si no, al hacer clic el select se queda en blanco. -->
         <select class="field" id="sort" style="width:auto" aria-label="Ordenar por">
           <option value="date">Orden: por fecha</option>
+          <option value="title">Orden: por nombre</option>
+          <option value="sold">Orden: más vendidas</option>
           <option value="expected">Orden: más gente esperada</option>
           <option value="rate">Orden: mayor % de asistencia</option>
           <option value="rate-asc">Orden: menor % de asistencia</option>
@@ -421,8 +425,11 @@ document.getElementById('theme').onclick = () => {
   const hero = document.getElementById('hero');
   if (!cv || !hero) return;
 
+  // preserveDrawingBuffer: en el camino de "un solo fotograma" (reduced-motion)
+  // el buffer se limpia tras componer y el hero se quedaría en negro pelado.
   const gl = cv.getContext('webgl', { alpha: true, premultipliedAlpha: true,
-                                      antialias: false, depth: false });
+                                      antialias: false, depth: false,
+                                      preserveDrawingBuffer: true });
   if (!gl) { hero.classList.add('no-gl'); cv.remove(); return; }
 
   const VERT = 'attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}';
@@ -445,10 +452,12 @@ document.getElementById('theme').onclick = () => {
     // la energía vive arriba a la derecha; el titular queda abajo-izquierda
     // el núcleo cae fuera del lienzo: se ve la trama, no un bloque sólido
     ' float glow=pow(clamp(1.-distance(uv,vec2(1.06,1.16))*.92,0.,1.),2.1);',
-    ' float e=clamp(n*glow*3.1-.05,0.,1.);',
+    // Ganancia contenida: el pico se queda en la zona tramada, así que
+    // siempre se ve la retícula en vez de un bloque liso.
+    ' float e=clamp(n*glow*2.2-.04,0.,1.);',
     // cuantización tramada a 4 niveles: de ahí el look de 8 bits
     ' float a=floor(e*4.+bayer(gl_FragCoord.xy))/4.;',
-    ' a=clamp(a,0.,1.)*.42;',
+    ' a=clamp(a,0.,1.)*.40;',
     ' vec3 col=vec3(1.,.82,.008);',            // #ffd102
     ' gl_FragColor=vec4(col*a,a);',            // premultiplicado
     '}'
@@ -492,11 +501,22 @@ document.getElementById('theme').onclick = () => {
     gl.uniform2f(uRes, w, h);
   }
 
-  const draw = t => { gl.uniform1f(uTime, t); gl.drawArrays(gl.TRIANGLES, 0, 3); };
+  // Hay que limpiar a mano: con preserveDrawingBuffer el buffer NO se vacía
+  // solo, y como se dibuja con blending cada fotograma se sumaría al anterior
+  // hasta convertir la esquina en una plancha amarilla.
+  gl.clearColor(0, 0, 0, 0);
+  const draw = t => {
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.uniform1f(uTime, t);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+  };
 
   // se lee aquí y no de la constante de abajo: este bloque corre antes
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    resize(); draw(12.0); return;                  // un solo fotograma, quieto
+    const once = () => { resize(); draw(12.0); };   // un solo fotograma, quieto
+    once();
+    addEventListener('resize', once, { passive: true });  // pero se repinta al cambiar de tamaño
+    return;
   }
 
   let visible = true, raf = 0, last = 0;
@@ -555,6 +575,28 @@ document.querySelectorAll('.reveal').forEach((el, i) => {
   el.style.setProperty('--d', (i * 70) + 'ms'); io.observe(el);
 });
 
+// Red de seguridad. El observer es fiable, pero el modo de fallo aquí es
+// "el contenido no se ve": si algo quedara sin disparar, esto lo destapa en
+// cuanto entra en pantalla. Barrido barato, y se apaga solo al terminar.
+(function safetyNet() {
+  let t = 0;
+  const sweep = () => {
+    t = 0;
+    const left = document.querySelectorAll('.reveal:not(.in)');
+    left.forEach(el => {
+      if (el.getBoundingClientRect().top < innerHeight) el.classList.add('in');
+    });
+    if (!document.querySelector('.reveal:not(.in)')) {
+      removeEventListener('scroll', onScroll);
+      removeEventListener('resize', onScroll);
+    }
+  };
+  const onScroll = () => { if (!t) t = setTimeout(sweep, 250); };
+  addEventListener('scroll', onScroll, { passive: true });
+  addEventListener('resize', onScroll, { passive: true });
+  addEventListener('load', () => setTimeout(sweep, 800));
+})();
+
 // contador del número protagonista
 function countUp(el, to) {
   if (reduced) { el.textContent = fmt(to); return; }
@@ -573,6 +615,10 @@ function countUp(el, to) {
 let DATA = null, TYPES = [], VIEW = [];
 let sortKey = 'date', query = '', onlyRisk = false;
 const cortPct = e => e.mix['Cortesía'] / e.sold * 100;
+// Columnas visibles ahora mismo (las de mezcla se ocultan). Se cuenta en vez
+// de dejar un número a mano, que se desincroniza al tocar la tabla.
+const ncols = () => [...document.querySelectorAll('#thr th')]
+  .filter(th => getComputedStyle(th).display !== 'none').length || 9;
 const tierVar = i => ['var(--tier-1)', 'var(--tier-2)', 'var(--tier-3)', 'var(--cortesia)'][i];
 
 fetch('data.json').then(r => r.json()).then(d => {
@@ -644,7 +690,7 @@ fetch('data.json').then(r => r.json()).then(d => {
   drawCurve(d.curve);
   paintTable();
 }).catch(() => {
-  $('#tb').innerHTML = '<tr><td colspan="12" class="empty">No se pudo cargar <code>data.json</code>.</td></tr>';
+  $('#tb').innerHTML = '<tr><td colspan="' + ncols() + '" class="empty">No se pudo cargar <code>data.json</code>.</td></tr>';
 });
 
 // ---------------------------------------------------------------
@@ -661,7 +707,8 @@ $('#nums').onclick = e => {
   const on = !document.body.classList.contains('shownums');
   document.body.classList.toggle('shownums', on);
   e.currentTarget.setAttribute('aria-pressed', String(on));
-};
+  paintTable();   // cambia el número de columnas visibles: el colspan del
+};                // estado vacío tiene que seguirlo
 
 // ---------------------------------------------------------------
 // tabla
@@ -700,7 +747,7 @@ function paintTable() {
   });
 
   if (!VIEW.length) {
-    $('#tb').innerHTML = '<tr><td colspan="12" class="empty">Ningún show coincide con el filtro.</td></tr>';
+    $('#tb').innerHTML = '<tr><td colspan="' + ncols() + '" class="empty">Ningún show coincide con el filtro.</td></tr>';
     return;
   }
 

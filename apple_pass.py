@@ -519,7 +519,17 @@ def pass2u_body(pass_json, ticket_number, images=None):
         "relevantDate": pass_json["relevantDate"],
         "expirationDate": pass_json["expirationDate"],
         "fields": fields,
-        "barcode": {"message": ticket_number, "altText": ticket_number},
+        # El QR lleva el payload firmado completo; el altText es solo la
+        # etiqueta que lee un humano y Pass2U la limita a 50 caracteres.
+        # Se muestra el id de la entrada, que es lo único legible de todos
+        # modos: "FT1.ft_tkt_0000003.ft_evt_0040.1788207583.2fbc332aac" no
+        # le dice nada a nadie en una fila.
+        "barcode": {
+            "message": ticket_number,
+            "altText": (ticket_number.split(".")[1]
+                        if ticket_number.startswith("FT1.") and "." in ticket_number
+                        else ticket_number)[:50],
+        },
     }
     if "locations" in pass_json:
         body["locations"] = pass_json["locations"]

@@ -102,6 +102,11 @@ function decode(tok) {
   } catch (e) { return null; }
 }
 
+// Todo el render cuelga del hash y se hace una sola vez. Si el hash cambia
+// sin recargar (otro link de puerta pegado en la misma pestaña) la tarjeta
+// se quedaría mostrando el show anterior.
+addEventListener('hashchange', () => location.reload());
+
 const tok = location.hash.slice(1);
 if (!tok) dead('label', 'Link incompleto', 'Falta el código del show.');
 else {
