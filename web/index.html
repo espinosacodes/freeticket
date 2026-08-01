@@ -1,0 +1,313 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FreeTicket — cuánta gente entra realmente</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  .viz-root {
+    color-scheme: light;
+    --surface-0: #f6f6f4;
+    --surface-1: #fcfcfb;
+    --border:    #e0e0da;
+    --text-primary:   #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted:     #77766f;
+    --series-1: #2a78d6;
+    --series-2: #eb6834;
+    --series-3: #1baf7a;
+    --series-4: #eda100;
+    --band:  #cddff5;
+    --good:  #1baf7a;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) .viz-root {
+      color-scheme: dark;
+      --surface-0: #111110;
+      --surface-1: #1a1a19;
+      --border:    #33332f;
+      --text-primary:   #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted:     #94938a;
+      --series-1: #3987e5;
+      --series-2: #d95926;
+      --series-3: #199e70;
+      --series-4: #c98500;
+      --band:  #4276b4;
+      --good:  #199e70;
+    }
+  }
+  :root[data-theme="dark"] .viz-root {
+    color-scheme: dark;
+    --surface-0: #111110;
+    --surface-1: #1a1a19;
+    --border:    #33332f;
+    --text-primary:   #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted:     #94938a;
+    --series-1: #3987e5;
+    --series-2: #d95926;
+    --series-3: #199e70;
+    --series-4: #c98500;
+    --band:  #4276b4;
+    --good:  #199e70;
+  }
+
+  .viz-root {
+    background: var(--surface-0);
+    color: var(--text-primary);
+    font: 15px/1.5 ui-sans-serif, -apple-system, "Segoe UI", system-ui, sans-serif;
+    padding: 28px 20px 60px;
+    max-width: 1080px;
+    margin: 0 auto;
+  }
+  h1 { font-size: 24px; margin: 0 0 4px; letter-spacing: -0.01em; }
+  h2 { font-size: 15px; margin: 0 0 14px; color: var(--text-secondary);
+       text-transform: uppercase; letter-spacing: .07em; font-weight: 600; }
+  .sub { color: var(--text-secondary); margin: 0 0 28px; }
+  section { background: var(--surface-1); border: 1px solid var(--border);
+            border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+
+  .hero { display: flex; flex-wrap: wrap; gap: 32px; }
+  .stat .n { font-size: 34px; font-weight: 650; letter-spacing: -0.02em;
+             font-variant-numeric: tabular-nums; }
+  .stat .l { color: var(--text-secondary); font-size: 13px; }
+  .stat .r { color: var(--text-muted); font-size: 13px;
+             font-variant-numeric: tabular-nums; }
+
+  .wrap { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  th { text-align: left; font-weight: 600; color: var(--text-secondary);
+       font-size: 12px; text-transform: uppercase; letter-spacing: .05em;
+       padding: 0 10px 8px; white-space: nowrap; }
+  td { padding: 9px 10px; border-top: 1px solid var(--border);
+       vertical-align: middle; }
+  .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .ev { font-weight: 550; }
+  .meta { color: var(--text-muted); font-size: 12.5px; }
+  .res { display: inline-block; font-size: 10.5px; padding: 1px 6px;
+         border-radius: 999px; border: 1px solid var(--border);
+         color: var(--text-secondary); margin-left: 6px; vertical-align: 1px; }
+
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 14px;
+            font-size: 13px; color: var(--text-secondary); }
+  .legend i { width: 10px; height: 10px; border-radius: 2px;
+              display: inline-block; margin-right: 6px; vertical-align: -1px; }
+
+  a.door { color: var(--series-1); text-decoration: none; font-size: 13px;
+           font-weight: 550; white-space: nowrap; }
+  a.door:hover { text-decoration: underline; }
+  .tip { position: fixed; pointer-events: none; opacity: 0; transition: opacity .1s;
+         background: var(--surface-1); border: 1px solid var(--border);
+         border-radius: 8px; padding: 8px 10px; font-size: 12.5px;
+         box-shadow: 0 4px 16px rgba(0,0,0,.14); z-index: 9;
+         font-variant-numeric: tabular-nums; }
+  .tip b { display: block; margin-bottom: 3px; }
+  button.toggle { background: none; border: 1px solid var(--border);
+                  color: var(--text-secondary); border-radius: 7px;
+                  padding: 5px 11px; font-size: 12.5px; cursor: pointer; }
+  .hidden { display: none; }
+  .note { color: var(--text-muted); font-size: 12.5px; margin-top: 12px; }
+</style>
+
+<div class="viz-root">
+  <h1>¿Cuánta gente entra realmente?</h1>
+  <p class="sub">Proyección de asistencia para los 30 shows de agosto, sobre las entradas ya adquiridas.</p>
+
+  <section>
+    <div class="hero" id="hero"></div>
+    <p class="note" id="backtest"></p>
+  </section>
+
+  <section>
+    <h2>Agosto, show por show</h2>
+    <div class="legend">
+      <span><i style="background:var(--band)"></i>rango p10–p90</span>
+      <span><i style="background:var(--series-1)"></i>esperado</span>
+      <span style="color:var(--text-muted)">· la barra va de 0 a las entradas vendidas</span>
+    </div>
+    <div class="wrap"><table id="fc"></table></div>
+  </section>
+
+  <section>
+    <h2>Mezcla de entradas</h2>
+    <div class="legend" id="mixleg"></div>
+    <div class="wrap"><table id="mix"></table></div>
+    <p class="note">La mezcla es lo que más manda: en julio la entrada pagada entró ~94% y la cortesía ~42%. Un show que vendió mucho con media cortesía no llena.</p>
+  </section>
+
+  <section>
+    <h2>Curva de llegada <span style="text-transform:none;font-weight:400">— 4.969 check-ins de julio</span></h2>
+    <div id="curve"></div>
+    <p class="note">Minutos respecto a la hora de inicio. Es lo que dice cuándo poner el pico de personal en la puerta.</p>
+  </section>
+
+  <section>
+    <h2>Calidad del cruce comprador ↔ Boom</h2>
+    <div class="wrap"><table id="match"></table></div>
+    <p class="note">Precisión sobre cobertura: 56 ventas con dos candidatos casi empatados se dejaron <b>sin</b> match a propósito. Inventarle un match a un comprador nuevo ensucia la proyección más de lo que la ayuda.</p>
+  </section>
+</div>
+
+<div class="tip" id="tip"></div>
+
+<script>
+const T = document.getElementById('tip');
+function tipOn(e, html) {
+  T.innerHTML = html; T.style.opacity = 1;
+  const r = T.getBoundingClientRect();
+  T.style.left = Math.min(e.clientX + 14, innerWidth - r.width - 8) + 'px';
+  T.style.top  = Math.min(e.clientY + 14, innerHeight - r.height - 8) + 'px';
+}
+function tipOff() { T.style.opacity = 0; }
+const fmt = n => n.toLocaleString('es-CO');
+const DAYS = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+function when(iso) {
+  const d = new Date(iso);
+  return DAYS[d.getUTCDay()].slice(0,3) + ' ' + d.getUTCDate() + ' · ' +
+         String(d.getUTCHours()).padStart(2,'0') + ':' + String(d.getUTCMinutes()).padStart(2,'0');
+}
+
+fetch('data.json').then(r => r.json()).then(d => {
+  const t = d.totales;
+
+  document.getElementById('hero').innerHTML = [
+    ['<span class="n">' + fmt(t.esperados) + '</span>', 'personas esperadas en agosto',
+     'rango ' + fmt(t.p10) + ' – ' + fmt(t.p90)],
+    ['<span class="n">' + fmt(t.entradas) + '</span>', 'entradas ya adquiridas',
+     Math.round(t.esperados / t.entradas * 100) + '% proyectado de asistencia'],
+    ['<span class="n">' + t.eventos + '</span>', 'shows por venir', '30 de julio ya etiquetados'],
+    ['<span class="n">' + fmt(d.match.cruzadas) + '</span>', 'ventas cruzadas con Boom',
+     Math.round(d.match.cruzadas / d.match.total_ventas * 100) + '% de ' + fmt(d.match.total_ventas)]
+  ].map(s => '<div class="stat">' + s[0] + '<div class="l">' + s[1] +
+             '</div><div class="r">' + s[2] + '</div></div>').join('');
+
+  document.getElementById('backtest').textContent =
+    'Backtest sobre 7 eventos de julio que el modelo no vio: error medio 4,7 personas, ' +
+    'y el 71% cayó dentro del rango p10–p90 (el objetivo es 80%).';
+
+  // ---- tabla de proyección, con barra de rango ----
+  const W = 190;
+  let h = '<tr><th>Show</th><th>Cuándo</th><th class="num">Vendidas</th>' +
+          '<th style="width:' + W + 'px">Proyección</th><th class="num">Esperado</th>' +
+          '<th class="num">Rango</th><th class="num">%</th><th>Puerta</th></tr>';
+  for (const e of d.events) {
+    const sc = v => v / e.sold * W;
+    h += '<tr>' +
+      '<td class="ev">' + e.title + (e.is_residency ? '<span class="res">residencia</span>' : '') +
+        '<div class="meta">' + e.venue + ' · ' + e.city + '</div></td>' +
+      '<td class="meta" style="white-space:nowrap">' + when(e.starts_at) + '</td>' +
+      '<td class="num">' + e.sold + '</td>' +
+      '<td><svg width="' + W + '" height="16" role="img" aria-label="esperado ' + e.expected +
+        ', rango ' + e.p10 + ' a ' + e.p90 + ' de ' + e.sold + ' vendidas">' +
+        '<rect x="0" y="6" width="' + W + '" height="4" rx="2" fill="var(--border)"/>' +
+        '<rect x="' + sc(e.p10) + '" y="4" width="' + Math.max(sc(e.p90 - e.p10), 3) +
+          '" height="8" rx="4" fill="var(--band)"/>' +
+        '<rect x="' + (sc(e.expected) - 1.5) + '" y="1" width="3" height="14" rx="1.5" fill="var(--series-1)"/>' +
+        '</svg></td>' +
+      '<td class="num" style="font-weight:600">' + e.expected + '</td>' +
+      '<td class="num meta">' + e.p10 + '–' + e.p90 + '</td>' +
+      '<td class="num">' + Math.round(e.rate * 100) + '%</td>' +
+      '<td><a class="door" href="puerta.html#' + e.token + '">abrir →</a></td>' +
+      '</tr>';
+  }
+  document.getElementById('fc').innerHTML = h;
+
+  // ---- mezcla de tipos, barra apilada con separador de 2px ----
+  const COL = ['var(--series-1)','var(--series-2)','var(--series-3)','var(--series-4)'];
+  document.getElementById('mixleg').innerHTML = d.types.map((t, i) =>
+    '<span><i style="background:' + COL[i] + '"></i>' + t + '</span>').join('');
+
+  let m = '<tr><th>Show</th><th style="width:260px">Mezcla</th>' +
+          d.types.map(t => '<th class="num">' + t + '</th>').join('') +
+          '<th class="num">Cortesía</th></tr>';
+  for (const e of d.events) {
+    const MW = 260; let x = 0;
+    let bars = '';
+    d.types.forEach((ty, i) => {
+      const w = e.mix[ty] / e.sold * MW;
+      if (w > 0) {
+        bars += '<rect x="' + x + '" y="2" width="' + Math.max(w - 2, 1) + '" height="12" rx="3" fill="' +
+                COL[i] + '"><title>' + ty + ': ' + e.mix[ty] + '</title></rect>';
+        x += w;
+      }
+    });
+    const cort = Math.round(e.mix['Cortesía'] / e.sold * 100);
+    m += '<tr><td class="ev">' + e.title + '</td>' +
+         '<td><svg width="260" height="16" role="img" aria-label="mezcla de tipos de entrada">' + bars + '</svg></td>' +
+         d.types.map(t => '<td class="num meta">' + e.mix[t] + '</td>').join('') +
+         '<td class="num" style="color:' + (cort > 30 ? 'var(--series-2)' : 'var(--text-muted)') +
+         ';font-weight:' + (cort > 30 ? 600 : 400) + '">' + cort + '%</td></tr>';
+  }
+  document.getElementById('mix').innerHTML = m;
+
+  // ---- curva de llegada ----
+  drawCurve(d.curve);
+
+  // ---- calidad del cruce ----
+  const ev = d.match.evidencia, top = Object.entries(ev).slice(0, 8);
+  const maxE = Math.max(...top.map(x => x[1]));
+  let q = '<tr><th>Evidencia que sostuvo el match</th><th class="num">Ventas</th><th style="width:200px"></th></tr>';
+  for (const [k, v] of top) {
+    q += '<tr><td>' + k.replace(/_/g, ' ') + '</td><td class="num">' + fmt(v) + '</td>' +
+         '<td><svg width="200" height="12"><rect x="0" y="2" width="' + (v / maxE * 200) +
+         '" height="8" rx="4" fill="var(--series-1)"/></svg></td></tr>';
+  }
+  q += '<tr><td colspan="3" style="padding-top:14px"></td></tr>';
+  for (const [k, v] of Object.entries(d.match.por_confianza)) {
+    q += '<tr><td>confianza ' + k + '</td><td class="num">' + fmt(v) + '</td><td></td></tr>';
+  }
+  document.getElementById('match').innerHTML = q;
+});
+
+function drawCurve(c) {
+  const W = 900, H = 220, P = { t: 16, r: 16, b: 34, l: 44 };
+  const iw = W - P.l - P.r, ih = H - P.t - P.b;
+  const maxY = Math.max(...c.map(p => p.pct));
+  const xs = m => P.l + (m - c[0].m) / (c[c.length - 1].m - c[0].m) * iw;
+  const ys = v => P.t + ih - v / maxY * ih;
+
+  let grid = '', ticks = '';
+  for (let i = 0; i <= 4; i++) {
+    const v = maxY * i / 4, y = ys(v);
+    grid += '<line x1="' + P.l + '" x2="' + (W - P.r) + '" y1="' + y + '" y2="' + y +
+            '" stroke="var(--border)" stroke-width="1"/>';
+    ticks += '<text x="' + (P.l - 8) + '" y="' + (y + 4) + '" text-anchor="end" font-size="11" ' +
+             'fill="var(--text-muted)">' + Math.round(v * 100) + '%</text>';
+  }
+  for (const p of c) {
+    ticks += '<text x="' + xs(p.m) + '" y="' + (H - 12) + '" text-anchor="middle" font-size="11" ' +
+             'fill="var(--text-muted)">' + (p.m > 0 ? '+' + p.m : p.m) + '</text>';
+  }
+
+  const line = c.map((p, i) => (i ? 'L' : 'M') + xs(p.m) + ' ' + ys(p.pct)).join(' ');
+  const area = line + ' L' + xs(c[c.length - 1].m) + ' ' + (P.t + ih) + ' L' + xs(c[0].m) + ' ' + (P.t + ih) + ' Z';
+  const peak = c.reduce((a, b) => b.pct > a.pct ? b : a);
+
+  let dots = '';
+  for (const p of c) {
+    dots += '<circle cx="' + xs(p.m) + '" cy="' + ys(p.pct) + '" r="4.5" fill="var(--series-1)" ' +
+            'stroke="var(--surface-1)" stroke-width="2"/>' +
+            '<circle cx="' + xs(p.m) + '" cy="' + ys(p.pct) + '" r="16" fill="transparent" ' +
+            'data-m="' + p.m + '" data-n="' + p.n + '" data-p="' + Math.round(p.pct * 100) +
+            '" data-c="' + Math.round(p.cum * 100) + '"/>';
+  }
+
+  document.getElementById('curve').innerHTML =
+    '<svg viewBox="0 0 ' + W + ' ' + H + '" style="width:100%;height:auto;overflow:visible" role="img" ' +
+    'aria-label="curva de llegada: pico en el minuto ' + peak.m + '">' + grid +
+    '<path d="' + area + '" fill="var(--band)" opacity=".5"/>' +
+    '<path d="' + line + '" fill="none" stroke="var(--series-1)" stroke-width="2" ' +
+    'stroke-linejoin="round" stroke-linecap="round"/>' + dots + ticks +
+    '<text x="' + xs(peak.m) + '" y="' + (ys(peak.pct) - 12) + '" text-anchor="middle" font-size="12" ' +
+    'font-weight="600" fill="var(--text-primary)">pico ' + Math.round(peak.pct * 100) + '%</text>' +
+    '</svg>';
+
+  document.querySelectorAll('#curve circle[data-m]').forEach(el => {
+    el.addEventListener('mousemove', e => tipOn(e,
+      '<b>minuto ' + (el.dataset.m > 0 ? '+' + el.dataset.m : el.dataset.m) + '</b>' +
+      el.dataset.p + '% de las entradas · ' + fmt(+el.dataset.n) + '<br>' +
+      el.dataset.c + '% ya adentro'));
+    el.addEventListener('mouseleave', tipOff);
+  });
+}
+</script>

@@ -1,0 +1,100 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FreeTicket — puerta</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  :root {
+    color-scheme: light dark;
+    --bg: #f6f6f4; --card: #fcfcfb; --border: #e0e0da;
+    --ink: #0b0b0b; --ink2: #52514e; --ink3: #77766f;
+    --accent: #2a78d6; --band: #cddff5;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #111110; --card: #1a1a19; --border: #33332f;
+            --ink: #fff; --ink2: #c3c2b7; --ink3: #94938a;
+            --accent: #3987e5; --band: #4276b4; }
+  }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+         font: 16px/1.5 ui-sans-serif, -apple-system, "Segoe UI", system-ui, sans-serif;
+         padding: 24px 14px 48px; }
+  .card { background: var(--card); border: 1px solid var(--border);
+          border-radius: 16px; padding: 26px 22px; max-width: 380px;
+          width: 100%; margin: 0 auto; }
+  .venue { font-size: 19px; font-weight: 600; letter-spacing: -.01em; }
+  .when { color: var(--ink2); margin-bottom: 26px; }
+  .big { font-size: 62px; font-weight: 650; line-height: 1;
+         letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+  .unit { font-size: 17px; color: var(--ink2); margin: 6px 0 2px; }
+  .range { color: var(--ink2); font-variant-numeric: tabular-nums; }
+  .of { color: var(--ink3); font-size: 14.5px; margin-top: 4px; }
+  .bar { height: 10px; border-radius: 5px; background: var(--border);
+         margin: 22px 0 26px; position: relative; overflow: hidden; }
+  .bar .band { position: absolute; top: 0; bottom: 0; background: var(--band); }
+  .bar .exp  { position: absolute; top: -3px; bottom: -3px; width: 3px;
+               border-radius: 2px; background: var(--accent); }
+  .row { display: flex; justify-content: space-between; padding: 11px 0;
+         border-top: 1px solid var(--border); }
+  .row span:first-child { color: var(--ink2); }
+  .row span:last-child { font-weight: 600; font-variant-numeric: tabular-nums; }
+  .exp-note { margin-top: 22px; font-size: 13px; color: var(--ink3); text-align: center; }
+  .dead { text-align: center; padding: 40px 10px; }
+  .dead .t { font-size: 19px; font-weight: 600; margin-bottom: 8px; }
+  .dead .s { color: var(--ink2); }
+</style>
+
+<div class="card" id="c"><div class="dead"><div class="s">Cargando…</div></div></div>
+
+<script>
+const DAYS = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+const dead = (t, s) => document.getElementById('c').innerHTML =
+  '<div class="dead"><div class="t">' + t + '</div><div class="s">' + s + '</div></div>';
+
+function decode(tok) {
+  try {
+    const pad = tok + '='.repeat((4 - tok.length % 4) % 4);
+    const raw = atob(pad.replace(/-/g, '+').replace(/_/g, '/'));
+    const [event_id, exp] = raw.split('|');
+    return { event_id, exp: +exp };
+  } catch (e) { return null; }
+}
+
+const tok = location.hash.slice(1);
+if (!tok) dead('Link incompleto', 'Falta el código del show.');
+else {
+  const t = decode(tok);
+  if (!t) dead('Link inválido', 'Este código no se puede leer.');
+  else if (Date.now() / 1000 > t.exp)
+    dead('Este link ya caducó', 'Valía hasta 3 horas después del show. Pedí uno nuevo.');
+  else fetch('data.json').then(r => r.json()).then(d => {
+    const e = d.events.find(x => x.event_id === t.event_id);
+    if (!e) return dead('Show no encontrado', 'El código apunta a un show que no está.');
+
+    const dt = new Date(e.starts_at), expd = new Date(t.exp * 1000);
+    const hm = x => String(x.getHours()).padStart(2,'0') + ':' + String(x.getMinutes()).padStart(2,'0');
+    const sg = v => v > 0 ? '+' + v : String(v);
+    const pk = e.peak_min, pkTxt = sg(pk) + ' a ' + sg(pk + 10);
+    const arrivals = Math.round(e.expected * 0.25);
+
+    document.getElementById('c').innerHTML =
+      '<div class="venue">' + e.venue + '</div>' +
+      '<div class="when">' + DAYS[dt.getUTCDay()] + ' ' + dt.getUTCDate() + ' · ' +
+        String(dt.getUTCHours()).padStart(2,'0') + ':' + String(dt.getUTCMinutes()).padStart(2,'0') + '</div>' +
+      '<div class="big">' + e.expected + '</div>' +
+      '<div class="unit">personas esperadas</div>' +
+      '<div class="range">entre ' + e.p10 + ' y ' + e.p90 + '</div>' +
+      '<div class="bar">' +
+        '<div class="band" style="left:' + (e.p10 / e.sold * 100) + '%;width:' +
+          ((e.p90 - e.p10) / e.sold * 100) + '%"></div>' +
+        '<div class="exp" style="left:calc(' + (e.expected / e.sold * 100) + '% - 1.5px)"></div>' +
+      '</div>' +
+      '<div class="of" style="margin-top:-14px">de ' + e.sold + ' entradas vendidas · ' +
+        Math.round(e.rate * 100) + '% proyectado</div>' +
+      '<div style="height:14px"></div>' +
+      '<div class="row"><span>Pico de llegada</span><span>' + pkTxt + ' min</span></div>' +
+      '<div class="row"><span>En ese pico entran</span><span>~' + arrivals + '</span></div>' +
+      '<div class="row"><span>Sugerido en puerta</span><span>' + e.staff + ' personas</span></div>' +
+      '<div class="exp-note">Este link caduca a las ' + hm(expd) + '.</div>';
+  }).catch(() => dead('Sin conexión', 'No se pudo cargar la proyección.'));
+}
+</script>
