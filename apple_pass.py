@@ -72,13 +72,72 @@ def _solid_png(width, height, rgb):
     )
 
 
-def make_assets():
-    """Write placeholder icons/logo/strip so the pipeline runs before real art exists."""
+def _load_source(source):
+    """Fetch the brand image from a URL or local path. Returns bytes, or None."""
+    source = source or os.environ.get("LOGO_URI")
+    if not source:
+        return None
+    if source.startswith(("http://", "https://")):
+        import requests
+        r = requests.get(source, timeout=20)
+        r.raise_for_status()
+        return r.content
+    path = Path(source)
+    return path.read_bytes() if path.exists() else None
+
+
+def make_assets(source=None):
+    """Cut the Apple-required image sizes from the brand logo.
+
+    Defaults to LOGO_URI — the same image the Google pass uses — so both wallets
+    render the same mark. Falls back to solid placeholders if it can't be loaded.
+    """
     ASSETS.mkdir(parents=True, exist_ok=True)
+    raw = _load_source(source)
+
+    if raw is None:
+        for name, (w, h) in IMAGE_SPECS.items():
+            colour = (255, 214, 10) if name.startswith("icon") else (18, 18, 18)
+            (ASSETS / name).write_bytes(_solid_png(w, h, colour))
+        print(f"no source image — wrote {len(IMAGE_SPECS)} placeholders to {ASSETS}")
+        return
+
+    import io
+
+    from PIL import Image
+
+    src = Image.open(io.BytesIO(raw)).convert("RGBA")
+    written = []
     for name, (w, h) in IMAGE_SPECS.items():
-        colour = (255, 214, 10) if name.startswith("icon") else (18, 18, 18)
-        (ASSETS / name).write_bytes(_solid_png(w, h, colour))
-    print(f"wrote {len(IMAGE_SPECS)} placeholder images to {ASSETS}")
+        if name.startswith("strip"):
+            continue  # strip is banner art, not the logo — handled below
+        if name.startswith("icon"):
+            # Icons must fill the square — Wallet masks them to a rounded rect.
+            img = src.resize((w, h), Image.LANCZOS)
+        else:
+            # logo is a bounding box: fit inside, never stretch.
+            img = src.copy()
+            img.thumbnail((w, h), Image.LANCZOS)
+        img.save(ASSETS / name, "PNG")
+        written.append(name)
+
+    # A square logo squeezed into the 375x98 strip box just yields a 98x98 square,
+    # so only build a strip when there is real banner art to build it from.
+    hero = _load_source(os.environ.get("HERO_URI")) if os.environ.get("HERO_URI") else None
+    for name in ("strip.png", "strip@2x.png"):
+        target = ASSETS / name
+        if hero:
+            w, h = IMAGE_SPECS[name]
+            img = Image.open(io.BytesIO(hero)).convert("RGBA")
+            img = img.resize((w, h), Image.LANCZOS)
+            img.save(target, "PNG")
+            written.append(name)
+        elif target.exists():
+            target.unlink()  # drop stale placeholders
+
+    print(f"wrote {len(written)} images to {ASSETS}: {', '.join(written)}")
+    if not hero:
+        print("no HERO_URI — pass will render without a strip image")
 
 
 # ── geocoding ────────────────────────────────────────────────────────────────
@@ -282,22 +341,166 @@ def build_pkpass(pass_json, out_path, sign=True):
     return out_path
 
 
+# ── preview ──────────────────────────────────────────────────────────────────
+
+def write_preview(pass_json, out_path):
+    """Render pass.json as HTML approximating the Wallet eventTicket layout.
+
+    An unsigned .pkpass cannot be opened by iOS or macOS, so this is the only way
+    to actually look at a pass before the signing certificate exists. It renders
+    from the real pass.json, so what you see is what the fields contain.
+    """
+    import base64
+    import io
+
+    import segno
+
+    t = pass_json["eventTicket"]
+
+    def data_uri(name):
+        p = ASSETS / name
+        return ("data:image/png;base64," + base64.b64encode(p.read_bytes()).decode()
+                if p.exists() else None)
+
+    logo_uri, strip_uri = data_uri("logo@2x.png"), data_uri("strip@2x.png")
+    brand = (f'<img class="logo" src="{logo_uri}" alt="">' if logo_uri
+             else f'<div class="dot"></div>')
+    strip = (f'<div class="strip" style="background-image:url({strip_uri})"></div>'
+             if strip_uri else "")
+    one = lambda group: t[group][0] if t[group] else {"label": "", "value": ""}
+
+    buf = io.BytesIO()  # segno's writers emit bytes, not str
+    segno.make(pass_json["barcodes"][0]["message"], error="q").save(
+        buf, kind="svg", scale=4, dark="#000", light="#fff", border=2, xmldecl=False, svgns=True
+    )
+    qr_svg = buf.getvalue().decode()
+
+    row = lambda f: (f'<div class="f"><span class="l">{f.get("label","")}</span>'
+                     f'<span class="v">{f["value"]}</span></div>')
+    back = "".join(
+        f'<div class="b"><span class="l">{f.get("label","")}</span>'
+        f'<span class="bv">{f["value"]}</span></div>'
+        for f in t["backFields"]
+    )
+
+    html = f"""<!doctype html><meta charset="utf-8">
+<title>{pass_json["description"]}</title>
+<style>
+  body {{ background:#0b0b0c; color:#fff; font:15px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+         display:flex; flex-wrap:wrap; gap:28px; justify-content:center; align-items:flex-start;
+         padding:44px 20px; margin:0; }}
+  .pass {{ width:330px; background:{pass_json["backgroundColor"].replace("rgb","rgba").replace(")",",1)")};
+           border-radius:14px; overflow:hidden; box-shadow:0 12px 40px rgba(0,0,0,.6); }}
+  .top {{ display:flex; justify-content:space-between; align-items:center; padding:14px 16px 10px; }}
+  .brand {{ display:flex; align-items:center; gap:8px; font-weight:600; font-size:15px; }}
+  .dot {{ width:22px; height:22px; border-radius:5px; background:{pass_json["labelColor"]}; }}
+  .logo {{ height:24px; width:auto; display:block; }}
+  .strip {{ height:92px; background-size:cover; background-position:center; }}
+  .body {{ padding:14px 16px 18px; }}
+  .l {{ display:block; color:{pass_json["labelColor"]}; font-size:9.5px; font-weight:600;
+        letter-spacing:.09em; margin-bottom:3px; }}
+  .v {{ font-size:15px; }}
+  .primary .v {{ font-size:23px; font-weight:600; }}
+  .grid {{ display:flex; gap:22px; margin-top:14px; flex-wrap:wrap; }}
+  .grid .f {{ flex:1; min-width:88px; }}
+  .qr {{ background:#fff; border-radius:9px; padding:9px; width:max-content;
+         margin:20px auto 6px; }}
+  .qr svg {{ display:block; }}
+  .alt {{ text-align:center; font-size:11px; color:#8a8a90; letter-spacing:.06em; }}
+  .card {{ width:330px; background:#151517; border-radius:14px; padding:6px 16px 14px; }}
+  .card h3 {{ font-size:11px; letter-spacing:.1em; color:#8a8a90; font-weight:600; margin:14px 0 4px; }}
+  .b {{ padding:11px 0; border-bottom:1px solid #232326; }}
+  .b:last-child {{ border-bottom:0; }}
+  .bv {{ font-size:14px; color:#d8d8dc; }}
+  .note {{ width:100%; text-align:center; color:#6a6a72; font-size:12px; }}
+</style>
+<div class="pass">
+  <div class="top">
+    <div class="brand">{brand}{pass_json["logoText"]}</div>
+    <div style="text-align:right">{row(one("headerFields"))}</div>
+  </div>
+  {strip}
+  <div class="body">
+    <div class="primary">{row(one("primaryFields"))}</div>
+    <div class="grid">{"".join(row(f) for f in t["secondaryFields"])}</div>
+    <div class="grid">{"".join(row(f) for f in t["auxiliaryFields"])}</div>
+    <div class="qr">{qr_svg}</div>
+    <div class="alt">{pass_json["barcodes"][0]["altText"]}</div>
+  </div>
+</div>
+<div class="card"><h3>REVERSO</h3>{back}</div>
+<p class="note">Vista previa desde pass.json — no es el render de iOS.</p>
+"""
+    out_path.write_text(html, encoding="utf-8")
+    return out_path
+
+
 # ── pass2u ───────────────────────────────────────────────────────────────────
 
-def pass2u_link(pass_json, ticket_number):
-    """Hand the pass to Pass2U, which signs it with their Pass Type ID certificate.
+P2U_IMAGE_CACHE = ROOT / ".pass2u-images.json"
 
-    NOTE: verify this request shape against https://www.pass2u.net/api/ before the
-    demo. Pass2U's v2 API is versioned and the field names below reflect the model
-    -based flow (you create a pass "model" in their dashboard, then POST per-pass
-    overrides). The rest of this file does not depend on it.
+# Pass2U's recommended @2x dimensions per image type.
+P2U_IMAGE_SIZES = {"icon": (58, 58), "logo": (100, 100),
+                   "thumbnail": (180, 180), "background": (360, 440)}
+
+
+def pass2u_images(refresh=False):
+    """Upload brand images to Pass2U and return {type: hex}.
+
+    Hexes are stable, so they're cached — re-uploading on every pass would be
+    pure waste. The Event Ticket Layout 1 model always renders a background and
+    thumbnail; there is no way to switch them off. So both are rendered as solid
+    backgroundColor (with the logo inset on the thumbnail), which makes them
+    disappear into the card the way the flat Google Wallet ticket looks.
     """
-    import requests
+    if P2U_IMAGE_CACHE.exists() and not refresh:
+        return json.loads(P2U_IMAGE_CACHE.read_text())
 
-    api_key = os.environ["PASS2U_API_KEY"]
-    model_id = os.environ["PASS2U_MODEL_ID"]
+    import io
+
+    import requests
+    from PIL import Image
+
+    src = Image.open(io.BytesIO(_load_source(None))).convert("RGBA")
+    dark = tuple(int(n) for n in
+                 os.environ.get("PASS_BG_RGB", "26,26,26").split(",")) + (255,)
+
+    def flat(w, h, logo_px=None):
+        im = Image.new("RGBA", (w, h), dark)
+        if logo_px:
+            lg = src.resize((logo_px, logo_px), Image.LANCZOS)
+            im.paste(lg, ((w - logo_px) // 2, (h - logo_px) // 2), lg)
+        return im
+
+    built = {
+        "icon": src.resize(P2U_IMAGE_SIZES["icon"], Image.LANCZOS),
+        "logo": src.resize(P2U_IMAGE_SIZES["logo"], Image.LANCZOS),
+        "thumbnail": flat(*P2U_IMAGE_SIZES["thumbnail"], logo_px=120),
+        "background": flat(*P2U_IMAGE_SIZES["background"]),
+    }
+
+    headers = {"x-api-key": os.environ["PASS2U_API_KEY"],
+               "Accept": "application/json", "Content-Type": "image/png"}
+    hexes = {}
+    for name, im in built.items():
+        buf = io.BytesIO()
+        im.save(buf, "PNG")
+        r = requests.post("https://api.pass2u.net/v2/images",
+                          headers=headers, data=buf.getvalue(), timeout=30)
+        if not r.ok:
+            raise SystemExit(f"pass2u image {name}: {r.status_code} {r.text[:200]}")
+        hexes[name] = r.json()["hex"]
+
+    P2U_IMAGE_CACHE.write_text(json.dumps(hexes, indent=2))
+    return hexes
+
+
+def pass2u_body(pass_json, ticket_number, images=None):
+    """The exact JSON payload POSTed to Pass2U. Split out so it can be dry-run:
+    credits are finite and non-replicable barcodes burn the ticket code on use."""
     ticket = pass_json["eventTicket"]
 
+    # Only Dynamic model fields are settable; keys must match the Model Designer.
     fields = [
         {"key": f["key"], "label": f.get("label", ""), "value": f["value"]}
         for group in ("headerFields", "primaryFields", "secondaryFields",
@@ -305,19 +508,74 @@ def pass2u_link(pass_json, ticket_number):
         for f in ticket[group]
     ]
 
+    # Mirror the locally-built pass so both providers render the same ticket.
     body = {
-        "barcode": {"message": ticket_number, "altText": ticket_number},
-        "fields": fields,
+        "description": pass_json["description"],
+        "organizationName": pass_json["organizationName"],
+        "logoText": pass_json["logoText"],
+        "foregroundColor": pass_json["foregroundColor"],
+        "backgroundColor": pass_json["backgroundColor"],
+        "labelColor": pass_json["labelColor"],
+        "relevantDate": pass_json["relevantDate"],
         "expirationDate": pass_json["expirationDate"],
+        "fields": fields,
+        "barcode": {"message": ticket_number, "altText": ticket_number},
     }
+    if "locations" in pass_json:
+        body["locations"] = pass_json["locations"]
+        body["maxDistance"] = pass_json["maxDistance"]
+    if images:
+        body["images"] = [{"type": t, "hex": h} for t, h in images.items()]
+    return body
+
+
+def pass2u_link(pass_json, ticket_number, send_fields=True):
+    """Hand the pass to Pass2U, which signs it with their Pass Type ID certificate.
+
+    This is the only route to a pass that installs in native Apple Wallet without
+    the $99 Apple Developer Program. Returns the public download URL — open it on
+    the iPhone and Wallet offers "Add".
+
+    Prerequisites in the Pass2U dashboard (manual, ~10 min):
+      1. Create an Event Ticket model; note its Model ID.
+      2. Every field you want to set here must be typed **Dynamic** in the Model
+         Designer, with a Key matching the keys below. Fixed/Points/Credits fields
+         are ignored by the API.
+      3. Set Barcode Type to "Dynamic - assigned by CSV file or API".
+
+    Request shape verified against Pass2U Pass API User Guide v2.2.3 (2023-03-01).
+    """
+    import requests
+
+    api_key = os.environ.get("PASS2U_API_KEY")
+    model_id = os.environ.get("PASS2U_MODEL_ID")
+    if not (api_key and model_id):
+        raise SystemExit(
+            "PASS2U_API_KEY and PASS2U_MODEL_ID are not set — see .env.example.\n"
+            "Both come from the Pass2U dashboard; the trial API key is free for 30 days."
+        )
+    body = pass2u_body(pass_json, ticket_number, images=pass2u_images())
+    if send_fields is False:
+        body.pop("fields", None)
 
     r = requests.post(
         f"https://api.pass2u.net/v2/models/{model_id}/passes",
-        headers={"x-api-key": api_key, "Content-Type": "application/json"},
+        headers={"x-api-key": api_key,
+                 "Accept": "application/json",
+                 "Content-Type": "application/json"},
         json=body,
         timeout=30,
     )
-    r.raise_for_status()
+    if not r.ok:
+        if "not defined as 'Dynamic'" in r.text:
+            raise SystemExit(
+                f"pass2u rejected a field: {r.text[:200]}\n\n"
+                "Pass2U hard-rejects field keys that aren't typed Dynamic in the\n"
+                "Model Designer — it does NOT fall back to model defaults.\n"
+                "Either type those keys as Dynamic in the model, or re-run with\n"
+                "--no-fields to issue a pass carrying only images/colors/barcode."
+            )
+        raise SystemExit(f"pass2u {r.status_code}: {r.text[:400]}")
     return f"https://www.pass2u.net/d/{r.json()['passId']}"
 
 
@@ -326,7 +584,8 @@ def pass2u_link(pass_json, ticket_number):
 if __name__ == "__main__":
     p = argparse.ArgumentParser()
     p.add_argument("--make-assets", action="store_true",
-                   help="write placeholder images and exit")
+                   help="cut Apple image sizes from LOGO_URI (or --source) and exit")
+    p.add_argument("--source", help="brand image URL or path; defaults to LOGO_URI")
     p.add_argument("--holder")
     p.add_argument("--ticket", help="ticket number / QR value, e.g. FT-000123")
     p.add_argument("--points", type=int, default=0)
@@ -337,11 +596,15 @@ if __name__ == "__main__":
                    help="build the bundle without signing (inspection only — will not install)")
     p.add_argument("--no-geocode", action="store_true",
                    help="skip the address lookup; omit locations unless VENUE_LAT/LON are set")
+    p.add_argument("--preview", action="store_true",
+                   help="also write an HTML rendering next to the .pkpass")
+    p.add_argument("--no-fields", action="store_true",
+                   help="pass2u: skip field overrides (use until model fields are Dynamic)")
     p.add_argument("--out")
     a = p.parse_args()
 
     if a.make_assets:
-        make_assets()
+        make_assets(a.source)
         raise SystemExit(0)
 
     if not (a.holder and a.ticket):
@@ -351,10 +614,12 @@ if __name__ == "__main__":
                                 allow_geocode=not a.no_geocode)
 
     if a.provider == "pass2u":
-        print(pass2u_link(pass_json, a.ticket))
+        print(pass2u_link(pass_json, a.ticket, send_fields=not a.no_fields))
     else:
         out = Path(a.out) if a.out else OUT / f"{a.ticket}.pkpass"
         build_pkpass(pass_json, out, sign=not a.unsigned)
         print(out)
+        if a.preview:
+            print(write_preview(pass_json, out.with_suffix(".html")))
         if a.unsigned:
             print("UNSIGNED — inspection only, iOS will reject this file.")

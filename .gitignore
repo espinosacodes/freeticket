@@ -49,3 +49,6 @@ out/
 
 # Cache de geocoding — regenerable
 .geocode-cache.json
+
+# Hashes de imágenes en Pass2U — atados a la cuenta, regenerables
+.pass2u-images.json
