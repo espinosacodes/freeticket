@@ -1,208 +1,191 @@
-# La demo — qué grabar y por qué gana
+# La demo
 
-Dos minutos. Sin slides, sin presentación personal, sin «hola, mi nombre es».
-Se abre la pantalla y funciona.
+**Objetivo: 60 segundos.** Techo duro: 2 minutos.
 
----
+La regla que manda todo lo que sigue:
 
-## La tesis, en 15 segundos
+> Al que ve el video no le importa en qué está hecho. Le importa que le
+> resuelve el viernes en la noche.
 
-> El reto pide proyectar cuánta gente entra. Lo hicimos: error medio de 4,7
-> personas. Pero abajo hay un problema más grande — **`checked_in` es un
-> campo que alguien llena, no un hecho que el sistema observa.** Proyectar
-> mejor sobre un dato malo tiene techo. Así que además cerramos el círculo:
-> el mismo escaneo que deja entrar a la persona genera el dato.
-
-Si solo se puede decir una frase, es esa. Todo lo demás la sostiene.
+Nada de Python, Lambda, HMAC, backtest, DynamoDB, modelo, pipeline. Ni una
+sola vez. Si una frase no cambia lo que el usuario **hace mañana**, se corta.
 
 ---
 
-## Antes de grabar — checklist
+## El corte de 60 segundos
+
+### 0:00 – 0:08 · El dolor, en su idioma
+
+Pantalla: el tablero, arriba.
+
+> «Vendiste 500 entradas. ¿Cuántas personas entran? Hoy nadie lo sabe, y la
+> puerta se arma a ojo.»
+
+Sin presentarte. Sin decir «les voy a mostrar». Arrancá en el problema.
+
+### 0:08 – 0:22 · La respuesta
+
+Señalá la cifra grande, después una fila.
+
+> «Esto te dice, show por show, cuánta gente va a entrar de verdad. Este
+> vendió 623 y entran 242 — porque la mitad son cortesías, y la cortesía no
+> llega. Con el mismo número de vendidas, dos shows llenan distinto.»
+
+Ese ejemplo es todo el producto en una frase: **vendido ≠ entrado**, y el
+sistema sabe la diferencia.
+
+### 0:22 – 0:38 · La puerta
+
+Abrí el link de puerta, en el teléfono.
+
+> «Y esto le llega por WhatsApp al que está en la puerta. Cuánta gente
+> esperar, a qué hora llega el pico, cuánta gente poner. Se abre y ya —
+> nadie va a abrir un computador un viernes a las ocho.»
+
+Pausá medio segundo en «3 personas en puerta». Ese es el producto haciendo
+el trabajo que hoy hace la intuición de alguien.
+
+### 0:38 – 0:55 · El momento
+
+Teléfono, cámara, QR.
+
+**Escaneo 1** → verde.
+
+> «La entrada vive en la wallet del celular. Escaneás y entra.»
+
+El contador sube en cámara. **Escaneo 2, el mismo código** → amarillo,
+«Ya entró».
+
+> «Y si el mismo código llega dos veces, te avisa. Hoy eso pasa y nadie se
+> entera.»
+
+**Este es el clip que se recuerda.** Si algo hay que sacrificar por tiempo,
+se saca de los tramos anteriores, nunca de este.
+
+### 0:55 – 1:00 · El cierre
+
+> «Y cada persona que entra le enseña al sistema a acertar más la próxima.»
+
+Cortá ahí. No agregues «gracias», no expliques nada más.
+
+---
+
+## Si necesitás los 2 minutos
+
+Insertá **solo estas dos**, en este orden de prioridad, y nada más:
+
+**A. El sin señal** (+12s, después del escaneo). Poné el teléfono en modo
+avión y escaneá.
+
+> «Y si en el bar no hay señal, la fila no se detiene. Se guarda y se sube
+> solo cuando vuelve.»
+
+Vale mucho porque cualquiera que haya trabajado una puerta sabe que ahí es
+donde todo se cae.
+
+**B. A quién darle la cortesía** (+15s, después de la mezcla).
+
+> «Y como sabemos quién es cada comprador, se puede saber a quién sí le
+> sirve una cortesía. Hoy se regalan a ciegas y entra menos de la mitad.»
+
+Es el único momento donde el cruce con Boom aparece — **como beneficio, no
+como técnica.**
+
+---
+
+## Traducción: de cómo está hecho → qué le das al usuario
+
+Si se te escapa una de la izquierda, corregí en el momento con la derecha.
+
+| No digas | Decí |
+|---|---|
+| «error medio de 4,7 personas» | «te falla por unas cinco personas» |
+| «rango p10–p90» | «entre 151 y 205 — el peor y el mejor caso» |
+| «cruzamos 3.995 ventas con Boom» | «sabemos quién es el que compró» |
+| «token HMAC que expira» | «el link se vence solo, no queda dando vueltas» |
+| «cola offline en localStorage» | «sin señal la fila no se detiene» |
+| «la curva de llegada de julio» | «la gente llega 10 minutos antes de empezar» |
+| «idempotente por scan_id» | «no cuenta a nadie dos veces» |
+| «Lambda, DynamoDB, API Gateway» | *(nada — no lo menciones)* |
+
+---
+
+## Antes de grabar
 
 ```bash
 cd ~/Documents/freeticket
-QR_SECRET=demo python3 scripts/mock_ingest.py 8788 &        # o el endpoint real
-QR_SECRET=demo python3 scripts/qr_demo.py --n 5 --png       # QR en out/qr/
+python3 -m http.server 8777 --directory web
 ```
 
-Ten abierto y listo:
-
-| Pestaña | Qué |
+| Dónde | Qué |
 |---|---|
-| 1 | https://espinosacodes.github.io/freeticket/ |
-| 2 | un link de puerta ya abierto (clic en «abrir →» de cualquier show) |
-| 3 | `out/qr/ft_tkt_0000001.png` en grande, para apuntarle la cámara |
-| Teléfono | https://espinosacodes.github.io/freeticket/escaner.html?api=… |
+| Pestaña 1 | https://espinosacodes.github.io/freeticket/ |
+| Pestaña 2 | un link de puerta ya abierto (clic en «abrir →») |
+| Pestaña 3 | `out/qr/ft_tkt_0000003.png` en grande |
+| Teléfono | https://espinosacodes.github.io/freeticket/escaner.html |
 
-**Grabá la pantalla del computador y filmá el teléfono aparte, o compartí la
-pantalla del teléfono.** Lo que no puede pasar es que el escaneo quede fuera
-de cuadro: es el momento que nadie más va a tener.
+El evento `ft_evt_0040` está en cero y los seis QR de `out/qr/` son válidos
+contra el sistema real. Si ensayás y quedan marcados, avisá y se resetea.
 
----
-
-## El guion, minuto a minuto
-
-### 0:00 – 0:20 · El número
-
-Pestaña 1. No expliques la interfaz, leé el resultado.
-
-> «3.519 personas esperadas sobre las 5.209 entradas ya vendidas para
-> agosto. Backtest sobre 7 shows de julio que el modelo nunca vio: **error
-> medio de 4,7 personas.**»
-
-Señalá una fila. La barra muestra el rango p10–p90 y la marca del esperado.
-
-> «Y esto no es un promedio por evento. Se predice entrada por entrada.»
-
-### 0:20 – 0:45 · Por qué la mezcla manda
-
-Bajá a «Mezcla de entradas». Buscá una fila con cortesía alta.
-
-> «Este show vendió 623 entradas y proyecta 242. No es que la gente no
-> quiera venir: **la mitad son cortesías.** En julio la entrada pagada entró
-> al 94% y la cortesía al 42%. La mezcla explica la mayor parte de la
-> diferencia entre dos shows que vendieron lo mismo.»
-
-Esto es lo que separa un modelo que entendió el negocio de uno que ajustó
-una curva.
-
-### 0:45 – 1:05 · El cruce, y lo que decidimos NO hacer
-
-Bajá a «Calidad del cruce».
-
-> «3.995 de 6.383 ventas cruzadas con Boom. Pero lo importante es al revés:
-> **56 ventas tenían dos candidatos casi empatados y las dejamos sin
-> match.** El enunciado dice que inventarle un match a un comprador nuevo es
-> peor que dejarlo sin match, así que el umbral está puesto para dejar gente
-> afuera.»
-
-Mencioná una sola sutileza, la que demuestra criterio:
-
-> «Y cuando el email coincide exacto pero el nombre no comparte ni un token,
-> es la firma de que compró con el correo de la pareja. Ese match baja de
-> confianza en vez de subir.»
-
-### 1:05 – 1:25 · La puerta
-
-Pestaña 2, el link efímero. Idealmente en la vista móvil.
-
-> «Esto se manda por WhatsApp a quien está en la puerta. Sin cuenta, sin
-> app. Cuánta gente se espera, el rango, el pico de llegada — que está 10
-> minutos **antes** de la hora de inicio — y cuánta gente poner. **Y caduca
-> solo tres horas después del show**, porque un link vivo con un número
-> viejo es peor que ningún link.»
-
-### 1:25 – 1:55 · El escaneo — el momento que gana
-
-Teléfono. Apuntá al QR de la pantalla.
-
-> «Y esto es lo que hoy no existe.»
-
-**Escaneo 1** → verde, «Adelante», el contador sube.
-
-> «El pase vive en la wallet del teléfono. El mismo escaneo que la deja
-> entrar **es** el dato: hora real, no hora de digitación.»
-
-**Escaneo 2, el mismo QR** → ámbar, «Ya entró».
-
-> «Y esto es un pase compartido. Hoy eso es invisible: el portero decide y
-> no queda registro. Acá queda medido.»
-
-Si te queda aire, poné el teléfono en modo avión y escaneá otro:
-
-> «Sin señal la puerta no se detiene. Queda en cola y sube sola cuando
-> vuelve la red.»
-
-### 1:55 – 2:00 · El cierre
-
-> «Julio se etiquetó a mano. Con esto, cada noche produce 300 etiquetas
-> limpias y el modelo se reentrena solo. **El activo no es el modelo, es el
-> dato que hoy nadie está capturando.**»
+**Grabá el escaneo sí o sí.** Si el celular no entra en cuadro, grabá la
+pantalla del celular aparte y pegá los dos clips. Es el único momento que
+nadie más va a tener.
 
 ---
 
-## Cómo se conecta cada beat con lo que califican
+## Para las preguntas, no para el video
 
-Los criterios de las slides, y qué momento de la demo los ataca:
+Esto **no** va grabado. Es para la ronda de preguntas.
 
-| Criterio | El beat | Por qué pega |
-|---|---|---|
-| **Credibilidad del cruce, precisión sobre cobertura** | 0:45 — las 56 descartadas | Casi todos van a presumir cobertura. Presumir lo que descartaste demuestra que leíste el enunciado. |
-| **Proyección con rangos honestos** | 0:00 — MAE 4,7 y el backtest | El backtest es sobre eventos **no vistos**, y el rango está calibrado contra el 80% objetivo, no inflado para no fallar. |
-| **Usabilidad real para la puerta** | 1:05 — el link efímero | No es un dashboard que alguien tendría que abrir. Es un WhatsApp que caduca. |
-| **Insights inesperados sobre patrones de acceso** | 1:25 — duplicados y curva de llegada | Nadie más va a mostrar una métrica de fuga por pases compartidos, porque nadie más va a estar capturando el escaneo. |
-| **Uso de IA** | implícito en todo | Está documentado en `NOTAS.md`. No hace falta gastar segundos de video. |
+**«¿Qué tan confiable es el número?»**
+> Se probó contra shows que el sistema nunca vio: falla por unas cinco
+> personas. Y el rango no está inflado para no equivocarse — está calibrado
+> para que 8 de cada 10 shows caigan adentro.
 
-**Dónde está la ventaja.** Los criterios 1 y 2 los va a atacar todo el
-mundo, y ahí se compite por décimas. Los criterios 3 y 4 son donde casi
-nadie va a llegar, porque exigen haber construido algo que se toca. Ahí es
-donde el escáner vale más que cualquier mejora marginal del modelo.
+**«¿Cruzaron todos los compradores?»**
+> El 63%. Y a propósito dejamos 56 sin cruzar: cuando había dos personas
+> igual de probables, preferimos no adivinar. Inventar un match ensucia la
+> proyección más de lo que la mejora.
 
----
+**«¿El escáner funciona de verdad o es una maqueta?»**
+> Funciona contra el sistema desplegado. Lo pueden probar ustedes desde el
+> celular ahora mismo, con los códigos del repo.
 
-## Las preguntas difíciles, y la respuesta honesta
+**«¿Apple no avisa cuando la persona llega al lugar?»**
+> No. Apple muestra la entrada en la pantalla de bloqueo cuando estás cerca,
+> pero eso pasa solo en el teléfono — al que emite la entrada nunca le
+> llega nada. La ubicación es comodidad para el usuario; el dato de
+> asistencia es el escaneo.
 
-Prepará estas cinco. La honestidad acá suma más que una respuesta pulida.
+*(Casi todo el mundo cree que ese aviso existe. Corregirlo vos mismo te
+pone del lado del que sabe.)*
 
-**«¿La cobertura del cruce no es baja? 62%.»**
-> Es la cobertura correcta para este dataset. El enunciado dice
-> explícitamente que una parte grande de los compradores no está en Boom.
-> Bajar el umbral subiría el número y ensuciaría la proyección, porque un
-> match falso le mete un perfil de asistencia ajeno a una entrada real.
-
-**«¿Cómo sé que el rango p10–p90 es honesto?»**
-> Porque no sale de la binomial. Medimos la dispersión real evento a evento
-> en julio y calibramos el ancho contra el objetivo del 80%. En el backtest
-> dio 71% sobre 7 eventos — que es 5 de 7 y no se distingue del 80% con esa
-> muestra. Lo reportamos así en vez de redondear hacia arriba.
-
-**«El escáner: ¿esto sirve con datos sintéticos?»**
-> El escáner no depende del dataset. Valida una firma HMAC y registra el
-> escaneo. Lo que es sintético es la data histórica, no el mecanismo. Está
-> corriendo, y las reglas de idempotencia están probadas.
-
-**«¿Apple Wallet no detecta cuando la persona llega al venue?»**
-> No. Apple muestra el pase en la pantalla de bloqueo cerca del venue, pero
-> **eso es local al dispositivo, el emisor nunca se entera.** No hay ping de
-> llegada. La geolocalización es UX; la señal de asistencia es el escaneo, y
-> solo el escaneo. Está escrito así en `docs/02-wallet-passes.md`.
-
-*(Esta es la que puede ganar la ronda de preguntas: la mayoría de la gente
-cree que sí existe ese ping. Corregirlo vos mismo, sin que te lo pregunten,
-te pone del lado del que sabe.)*
-
-**«¿Qué falta para producción?»**
-> El ingest está desplegable — CloudFormation, Lambda y DynamoDB están en
-> `lambda/`, con CI por OIDC y sin llaves guardadas. Falta el Issuer ID de
-> Google Wallet, y Apple nativo necesita el programa de desarrollador.
-> Ninguna de las dos es una decisión técnica pendiente; son trámites.
+**«¿Cuánto falta para usarlo?»**
+> El tablero, el link de puerta y el escáner están corriendo hoy. Para
+> emitir entradas a nombre de FreeTicket falta un trámite con Google y otro
+> con Apple. Ninguna decisión técnica pendiente.
 
 ---
 
-## Lo que NO hay que decir
+## Lo que no hay que decir, nunca
 
-Cuidado con estas, porque son las que se caen con una repregunta:
-
-- ❌ «Predecimos si **una persona** va a entrar.» → Se proyecta un evento
-  sumando probabilidades por entrada. La probabilidad individual no está
-  calibrada y no la vamos a defender.
-- ❌ «Apple nos avisa cuando llegan.» → Falso. Ver arriba.
-- ❌ «Detectamos fraude.» → Medimos duplicados. Que un pase se escanee dos
-  veces puede ser fraude o puede ser un error de la puerta. La métrica es
-  real; la interpretación no la afirmamos.
-- ❌ «El modelo aprende solo.» → Todavía no. Está **escrito para** consumir
-  esos campos, y esa es la diferencia entre una spec seria y una promesa.
-- ❌ Prometer números de negocio («subimos la asistencia 20%»). No hay con
-  qué sostenerlo y el jurado lo va a notar.
+- ❌ «Predecimos si **una persona** va a entrar» → se proyecta el show
+  completo, no el individuo. No lo vamos a defender.
+- ❌ «Apple nos avisa cuando llegan» → falso.
+- ❌ «Detectamos fraude» → medimos códigos repetidos. Puede ser fraude o
+  puede ser un error de la puerta. El dato es real; la interpretación no la
+  afirmamos.
+- ❌ «Sube la asistencia un 20%» → no hay con qué sostenerlo.
+- ❌ Cualquier palabra de infraestructura.
 
 ---
 
-## Qué entregar en el formulario
+## El formulario
 
 | | |
 |---|---|
 | Repo | https://github.com/espinosacodes/freeticket |
-| Demo en vivo | https://espinosacodes.github.io/freeticket/ |
-| Video | 2 minutos, según el guion de arriba |
+| En vivo | https://espinosacodes.github.io/freeticket/ |
+| Video | 60s (máx. 2 min) |
 | Notas | [`NOTAS.md`](NOTAS.md) |
 | Entregas | [`out/matches.csv`](out/matches.csv) · [`out/forecast.csv`](out/forecast.csv) |
