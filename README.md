@@ -3,6 +3,10 @@
 Solución al hackathon FreeTicket — Santiago Espinosa, 1 de agosto de 2026.
 El enunciado original está en [`RETO.md`](RETO.md).
 
+**Tablero en vivo → https://espinosacodes.github.io/freeticket/**
+
+Se republica solo en cada push que toque `web/`, `out/` o `pipeline/`.
+
 ## Correr todo
 
 ```bash
@@ -80,6 +84,31 @@ el dato**:
 `wallet_pass.py` genera pases de Google Wallet reales: la clase se crea una
 vez por show y cada entrada se firma como JWT, así que emitir 500 pases
 cuesta 500 firmas locales y **cero** llamadas al API de Google.
+
+## Despliegue
+
+| Qué | Dónde | Cuándo |
+|---|---|---|
+| Tablero | GitHub Pages | push que toque `web/`, `out/` o `pipeline/` |
+| Ingest de escaneos | AWS Lambda + DynamoDB | push que toque `lambda/**` |
+
+El despliegue a AWS se autentica por **OIDC**: no hay `AWS_ACCESS_KEY_ID`
+guardado en el repo ni en los secrets, así que no hay llave que se pueda
+filtrar. El rol solo lo puede asumir este repositorio, desde `main`, y solo
+alcanza a este stack.
+
+Preparación, una sola vez:
+
+```bash
+bash scripts/aws-bootstrap.sh      # crea el proveedor OIDC y el rol
+gh secret set AWS_DEPLOY_ROLE_ARN --body 'arn:aws:iam::<cuenta>:role/freeticket-github-deploy'
+gh secret set QR_SECRET --body "$(openssl rand -hex 32)"
+gh variable set AWS_REGION --body 'us-east-1'
+```
+
+La tabla de escaneos es **append-only por permisos**, no por convención: el
+rol de la Lambda no tiene `DeleteItem` ni `UpdateItem`, así que no puede
+reescribir la historia ni con un bug de por medio.
 
 ## Estructura
 
