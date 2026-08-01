@@ -37,3 +37,18 @@ secrets/
 __pycache__/
 .venv/
 *.pyc
+
+# Apple Wallet — firmas y passes generados, nunca al repo
+*.p12
+*.pem
+*.key
+*.cer
+*.certSigningRequest
+out/
+*.pkpass
+
+# Cache de geocoding — regenerable
+.geocode-cache.json
+
+# Hashes de imágenes en Pass2U — atados a la cuenta, regenerables
+.pass2u-images.json
