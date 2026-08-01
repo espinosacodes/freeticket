@@ -2,7 +2,7 @@
 
 **0:00 · tablero, arriba**
 
-Una tiquetera vende quinientas entradas.
+Una tiquetera vende 500 entradas.
 
 ¿Cuántas personas entran de verdad?
 
@@ -14,23 +14,21 @@ Si sobra personal, perdés plata. Si falta, la fila da la vuelta a la manzana.
 
 **0:12 · las cifras grandes**
 
-Para agosto: tres mil quinientas diecinueve personas esperadas,
+Para agosto: 3.519 personas esperadas,
 
-sobre cinco mil doscientas nueve entradas ya vendidas.
+sobre 5.209 entradas ya vendidas.
 
-Sesenta y ocho por ciento.
+68%.
 
 Y esto no es un número suelto.
 
-Lo probamos contra siete shows de julio que el modelo nunca vio:
+Lo probamos contra 7 shows de julio que el modelo nunca vio:
 
-falla por cuatro coma siete personas en promedio.
+falla por 4,7 personas en promedio.
 
 El rango tampoco está inflado para no equivocarnos.
 
-Está calibrado, y el setenta y uno por ciento cayó adentro,
-
-contra un objetivo del ochenta.
+Está calibrado, y el 71% cayó adentro, contra un objetivo del 80%.
 
 &nbsp;
 
@@ -38,23 +36,19 @@ contra un objetivo del ochenta.
 
 Miren estos dos. Es el mismo comediante.
 
-El de arriba vendió seiscientas veintitrés entradas.
+El de arriba vendió 623 entradas.
 
-Y entran doscientas cuarenta y dos. Treinta y nueve por ciento.
+Y entran 242. 39%.
 
-El otro vendió cuatrocientas veinticuatro, y entran trescientas noventa y cinco.
-
-Noventa y tres por ciento.
+El otro vendió 424, y entran 395. 93%.
 
 ¿Qué cambia?
 
 La columna de la derecha.
 
-El primero es cien por ciento cortesías. El segundo, dos por ciento.
+El primero es 100% cortesías. El segundo, 2%.
 
-En julio la entrada pagada entró al noventa y cuatro por ciento.
-
-La cortesía, al cuarenta y dos.
+En julio la entrada pagada entró al 94%. La cortesía, al 42%.
 
 Vender no es llenar.
 
@@ -66,11 +60,11 @@ Lo que manda no es cuántas entradas. Es cuáles.
 
 Y esto convierte la proyección en algo que se usa.
 
-Sobre cuatro mil novecientos sesenta y nueve check-ins reales de julio:
+Sobre 4.969 check-ins reales de julio:
 
-el pico de llegada está diez minutos antes de que arranque el show.
+el pico de llegada está 10 minutos antes de que arranque el show.
 
-No a las ocho. Diez minutos antes.
+No a las 8. 10 minutos antes.
 
 Esa es la hora a la que hay que tener la puerta lista.
 
@@ -82,15 +76,15 @@ Y esto le llega por WhatsApp al que está en la puerta.
 
 Sin cuenta, sin app.
 
-Ace of Clubs, martes: setenta y tres personas esperadas, de ciento veinte vendidas.
+Ace of Clubs, martes: 73 personas esperadas, de 120 vendidas.
 
-El pico, diez minutos antes. En ese pico entran unas diez.
+El pico, 10 minutos antes. En ese pico entran unas 10.
 
-Sugerido: dos personas en la puerta.
+Sugerido: 2 personas en la puerta.
 
 Y el link caduca solo.
 
-Nadie va a abrir un computador un viernes a las ocho de la noche.
+Nadie va a abrir un computador un viernes a las 8 de la noche.
 
 Un link viejo con un número viejo es peor que ninguno.
 
@@ -102,11 +96,11 @@ Todo esto se apoya en cruzar al comprador de la tiquetera
 
 con su historial en Boom.
 
-Cruzamos tres mil novecientas noventa y cinco ventas.
+Cruzamos 3.995 ventas.
 
 Pero lo importante es al revés:
 
-cincuenta y seis las dejamos sin cruzar, a propósito.
+56 las dejamos sin cruzar, a propósito.
 
 Cuando había dos personas igual de probables, preferimos no adivinar.
 
@@ -134,6 +128,6 @@ Y cualquiera puede escanear: no hace falta un equipo entrenado.
 
 Cada noche deja de ser una lista de papel
 
-y pasa a ser trescientas etiquetas limpias
+y pasa a ser 300 etiquetas limpias
 
 que le enseñan al sistema a acertar más la próxima.
