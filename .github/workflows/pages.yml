@@ -1,0 +1,62 @@
+name: Publicar el tablero
+
+# Se dispara solo cuando cambia lo que el tablero muestra. Un commit que
+# solo toca docs/ no vuelve a desplegar.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'web/**'
+      - 'out/**'
+      - 'pipeline/**'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Si entran dos pushes seguidos, gana el último; no se cancela un deploy
+# a mitad de camino.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Regenerar data.json desde out/
+        # El tablero se arma de las entregas versionadas, no de raw/ (que no
+        # va al repo). Si out/ está, se reconstruye; si no, se usa el
+        # data.json que ya está commiteado.
+        run: |
+          if [ -f out/forecast_detalle.csv ] && [ -d raw ]; then
+            python3 pipeline/build_web.py
+          else
+            echo "Sin raw/: se publica el web/data.json versionado."
+          fi
+
+      - name: Verificar que el sitio está completo
+        run: |
+          for f in web/index.html web/puerta.html web/data.json; do
+            test -s "$f" || { echo "Falta $f"; exit 1; }
+          done
+          python3 -c "import json;d=json.load(open('web/data.json'));assert d['events'],'data.json sin eventos';print(len(d['events']),'eventos')"
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: web
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
