@@ -70,6 +70,7 @@ def run(raw="raw", out="out", web="web"):
             "mix": {k: mix[r["event_id"]].get(k, 0) for k in TYPE_ORDER},
             "staff": staff,
             "peak_min": peak_min,
+            "peak_pct": round(peak_pct, 4),
             "token": token(r["event_id"], r["starts_at"]),
         })
 

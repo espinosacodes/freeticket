@@ -5,7 +5,7 @@ Orden de lo que se ve, con el texto exacto para la voz.
 | # | Tiempo | En pantalla | Narración |
 |---|---|---|---|
 | 1 | 0:00–0:11 | `1-tablero.mp4` | Vendiste quinientas entradas. ¿Cuántas personas entran? Hoy nadie lo sabe, y la puerta se arma a ojo. |
-| 2 | 0:11–0:28 | `1-tablero.mp4` (scroll) | Esto te dice, show por show, cuánta gente va a entrar de verdad. Mirá este: vendió seiscientas veintitrés, y entran doscientas cuarenta y dos. La mitad son cortesías, y la cortesía no llega. |
+| 2 | 0:11–0:28 | `1-tablero.mp4` (scroll) | Esto te dice, show por show, cuánta gente va a entrar de verdad. Mirá este: vendió doscientas ochenta y seis entradas. Entran ciento tres. Cien por ciento cortesías, y la cortesía no llega. |
 | 3 | 0:28–0:42 | `2-puerta.mp4` | Y esto le llega por WhatsApp al que está en la puerta. Cuánta gente esperar, a qué hora llega el pico, cuánta gente poner. Nadie va a abrir un computador un viernes a las ocho. |
 | 4 | 0:42–0:55 | **cámara: Android** | La entrada vive en la wallet del celular. Esto es un Android. |
 | 5 | 0:55–1:06 | **cámara: iPhone** | Y esto es un iPhone. La misma entrada, en las dos. |

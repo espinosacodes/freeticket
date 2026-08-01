@@ -119,10 +119,14 @@ else {
     if (!e) return dead('search', 'Show no encontrado', 'El código apunta a un show que no está.');
 
     const dt = new Date(e.starts_at), expd = new Date(t.exp * 1000);
-    const hm = x => String(x.getHours()).padStart(2, '0') + ':' + String(x.getMinutes()).padStart(2, '0');
+    // Mismo huso que la hora del show (que se muestra en UTC): si una va
+    // en local y la otra en UTC, el link parece caducar antes del show.
+    const hm = x => String(x.getUTCHours()).padStart(2, '0') + ':' + String(x.getUTCMinutes()).padStart(2, '0');
     const sg = v => v > 0 ? '+' + v : String(v);
     const pk = e.peak_min;
-    const arrivals = Math.round(e.expected * 0.25);
+    // El porcentaje del decil pico, medido sobre los check-ins de julio,
+    // no un 25% inventado que contradice la curva del tablero.
+    const arrivals = Math.round(e.expected * (e.peak_pct || 0.25));
 
     document.getElementById('c').innerHTML =
       '<div class="venue">' + esc(e.venue) + '</div>' +
