@@ -1,0 +1,105 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: FreeTicket — ingest de escaneos de puerta (docs/01-scan-telemetry.md)
+
+Parameters:
+  QrSecret:
+    Type: String
+    NoEcho: true
+    Description: Secreto HMAC que firma los QR. Ver docs/01-scan-telemetry.md.
+  AllowOrigin:
+    Type: String
+    Default: '*'
+    Description: Origen permitido por CORS. En producción, el dominio del escáner.
+
+Resources:
+  ScansTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: freeticket-scans
+      # On-demand: la puerta es un pico de 20 minutos y luego nada. Pagar
+      # capacidad provisionada por eso no tiene sentido.
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: pk
+          AttributeType: S
+        - AttributeName: sk
+          AttributeType: S
+      KeySchema:
+        - AttributeName: pk
+          KeyType: HASH
+        - AttributeName: sk
+          KeyType: RANGE
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+
+  FnRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal: { Service: lambda.amazonaws.com }
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: escribir-escaneos
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              # Sin DeleteItem ni UpdateItem a propósito: el log es
+              # append-only. La función no tiene permiso de reescribir la
+              # historia aunque el código tuviera un bug.
+              - Effect: Allow
+                Action: [dynamodb:PutItem, dynamodb:Query, dynamodb:GetItem]
+                Resource: !GetAtt ScansTable.Arn
+
+  Fn:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: freeticket-scan-ingest
+      Runtime: python3.12
+      Handler: handler.lambda_handler
+      Role: !GetAtt FnRole.Arn
+      Timeout: 15
+      MemorySize: 256
+      Environment:
+        Variables:
+          SCANS_TABLE: !Ref ScansTable
+          QR_SECRET: !Ref QrSecret
+          ALLOW_ORIGIN: !Ref AllowOrigin
+      Code:
+        # Marcador: el workflow sube el código real con update-function-code
+        # inmediatamente después. Así no hace falta un bucket de S3.
+        ZipFile: |
+          def lambda_handler(event, context):
+              return {"statusCode": 503, "body": "pendiente de desplegar"}
+
+  FnUrl:
+    Type: AWS::Lambda::Url
+    Properties:
+      TargetFunctionArn: !GetAtt Fn.Arn
+      # El escáner de puerta corre en el navegador de un teléfono prestado:
+      # no hay dónde guardar credenciales de AWS. La autorización real es la
+      # firma HMAC del QR, que la función valida en cada escaneo.
+      AuthType: NONE
+      Cors:
+        AllowOrigins: [!Ref AllowOrigin]
+        AllowMethods: [GET, POST]
+        AllowHeaders: [content-type]
+
+  FnUrlPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt Fn.Arn
+      Action: lambda:InvokeFunctionUrl
+      Principal: '*'
+      FunctionUrlAuthType: NONE
+
+Outputs:
+  Endpoint:
+    Description: URL base del ingest
+    Value: !GetAtt FnUrl.FunctionUrl
+  Tabla:
+    Value: !Ref ScansTable

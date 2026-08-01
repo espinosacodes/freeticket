@@ -1,0 +1,70 @@
+name: Desplegar el ingest de escaneos
+
+# Solo cuando cambia el servidor. Un cambio en el tablero no redespliega
+# la Lambda, y al revés.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'lambda/**'
+      - '.github/workflows/lambda.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write        # necesario para OIDC; no hay llaves guardadas
+
+concurrency:
+  group: lambda-deploy
+  cancel-in-progress: false
+
+env:
+  STACK: freeticket-scan-ingest
+  FUNCTION: freeticket-scan-ingest
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compilar el handler
+        # Falla rápido y sin AWS de por medio si el Python no compila.
+        run: python3 -m py_compile lambda/handler.py
+
+      - name: Autenticarse en AWS por OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION || 'us-east-1' }}
+
+      - name: Infraestructura
+        run: |
+          aws cloudformation deploy \
+            --stack-name "$STACK" \
+            --template-file lambda/template.yaml \
+            --capabilities CAPABILITY_IAM \
+            --no-fail-on-empty-changeset \
+            --parameter-overrides \
+              QrSecret="${{ secrets.QR_SECRET }}" \
+              AllowOrigin="${{ vars.ALLOW_ORIGIN || '*' }}"
+
+      - name: Subir el código
+        run: |
+          cd lambda && zip -q -r ../fn.zip handler.py && cd ..
+          aws lambda update-function-code \
+            --function-name "$FUNCTION" \
+            --zip-file fileb://fn.zip \
+            --publish >/dev/null
+          aws lambda wait function-updated --function-name "$FUNCTION"
+
+      - name: Probar que quedó vivo
+        run: |
+          URL=$(aws cloudformation describe-stacks --stack-name "$STACK" \
+                --query "Stacks[0].Outputs[?OutputKey=='Endpoint'].OutputValue" --output text)
+          echo "Endpoint: $URL"
+          CODE=$(curl -s -o /tmp/r.json -w '%{http_code}' "${URL}salud")
+          cat /tmp/r.json; echo
+          test "$CODE" = "200" || { echo "El endpoint no responde 200"; exit 1; }
+          echo "### Ingest desplegado" >> $GITHUB_STEP_SUMMARY
+          echo "\`$URL\`" >> $GITHUB_STEP_SUMMARY
